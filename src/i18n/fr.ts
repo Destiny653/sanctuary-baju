@@ -88,10 +88,10 @@ export const fr: Dict = {
       "Le sanctuaire est formé de deux monts séparés par une cascade. Le mont féminin appartient à la Bienheureuse Vierge Marie et porte les quatre mystères du Rosaire. Le mont masculin porte les quatorze stations de la Passion du Christ.",
     enterMary: "Gravir le mont de Marie",
     enterCalvary: "Gravir le mont du Calvaire",
-    wayKicker: "Le mont masculin",
+    wayKicker: "Le jardin nord",
     wayTitle: "Il l'a portée",
     wayLead:
-      "Les stations gravissent la colline sur un chemin de terre rouge, entre bananiers et palmiers. Le Christ est là, la croix sur l'épaule. On commence debout. Rien n'oblige à s'agenouiller.",
+      "Les stations gravissent la colline sur un chemin de terre rouge, entre bananiers et palmiers. Le Christ est là, grandeur nature, la croix sur l'épaule. On commence debout. Rien n'oblige à s'agenouiller.",
     wayCta: "Les quatorze stations",
     wayFigureAlt: "Le Christ en homme africain portant la croix",
     wayCrowdAlt: "L'assemblée debout dans la chapelle, en tissu blanc et bleu ciel, vue de dos",

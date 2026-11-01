@@ -89,10 +89,10 @@ export const en = {
       "The sanctuary is two mountains separated by a waterfall. The female mountain belongs to the Blessed Virgin Mary and carries the four mysteries of the rosary. The male mountain carries the fourteen stations of the Passion of Christ.",
     enterMary: "Climb the Mount of Mary",
     enterCalvary: "Climb the Mount of Calvary",
-    wayKicker: "The male mountain",
+    wayKicker: "The north garden",
     wayTitle: "He carried it",
     wayLead:
-      "The stations climb the hill on a red-earth path between banana and palm. Christ is there, the cross on the shoulder. People begin on their feet. Nothing requires them to kneel.",
+      "The stations climb the hill on a red-earth path between banana and palm. Christ is there, carved life-size, the cross on the shoulder. People begin on their feet. Nothing requires them to kneel.",
     wayCta: "The fourteen stations",
     wayFigureAlt: "Figure of Christ as an African man carrying the cross",
     wayCrowdAlt: "The congregation standing in the chapel in white and sky-blue cloth, seen from behind",

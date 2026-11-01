@@ -71,32 +71,25 @@ export function Interlude() {
 }
 
 export function Way() {
+  const { t } = useI18n();
   return (
     <section className="way band-snow" id="way" data-scroll>
-      <img className="fill ken" src={art.hills} alt="" loading="lazy" />
+      <img className="fill ken way-bg" src={art.northGarden} alt="" loading="lazy" />
       <div className="way-shade" />
       <Shards />
       <div className="way-copy glass" data-reveal>
-        <p className="kicker">The north garden</p>
-        <h2 className="display-lg">He carried it</h2>
-        <p className="serif-lead">
-          The stations climb the hill on a red-earth path between banana and palm. Christ is there,
-          carved life-size, the cross on the shoulder. People begin on their feet. Nothing requires
-          them to kneel.
-        </p>
+        <p className="kicker">{t.home.wayKicker}</p>
+        <h2 className="display-lg">{t.home.wayTitle}</h2>
+        <p className="serif-lead">{t.home.wayLead}</p>
       </div>
       <img
         className="way-figure para"
         src={art.christ}
-        alt="Carved figure of Christ as an African man carrying the cross"
+        alt={t.home.wayFigureAlt}
         loading="lazy"
       />
       <figure className="way-crowd">
-        <img
-          src={art.worship}
-          alt="The congregation standing in the chapel in white and sky-blue cloth, seen from behind"
-          loading="lazy"
-        />
+        <img src={art.worship} alt={t.home.wayCrowdAlt} loading="lazy" />
       </figure>
     </section>
   );

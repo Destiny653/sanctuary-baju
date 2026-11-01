@@ -14,6 +14,7 @@ export const art = {
   hands: `${M}/10_Institution_of_the_Eucharist.png`,
   heaven: `${I}/heaven.jpg`,
   hills: `${M}/03_Nativity.png`,
+  northGarden: `${I}/north-garden.jpg`,
   mary: `${I}/mary-af.png`,
   sanctuary: `${M}/19_Assumption_of_Mary.png`,
   worship: `${M}/20_Coronation_of_Mary.png`,

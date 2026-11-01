@@ -35,7 +35,7 @@ export const places = [
     n: "02",
     name: "The Garden Oratory",
     text: "Twelve arches, open to the weather. None is said here when the day is fair.",
-    image: art.hills,
+    image: art.northGarden,
     alt: "A red-earth path of white stations climbing a green hill among palms",
   },
   {
