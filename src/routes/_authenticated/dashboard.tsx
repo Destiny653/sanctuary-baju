@@ -1,16 +1,16 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-
+  CalendarDays,
   ExternalLink,
-
+  Images,
   LayoutDashboard,
   LogOut,
-
-
-
-
-
+  Mail,
+  MapPinned,
+  Newspaper,
+  Sparkles,
+  Users,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LangSwitch, useI18n } from "@/i18n";
@@ -21,7 +21,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -57,10 +56,22 @@ function DashboardLayout() {
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
+    const { signOutLocal } = await import("@/integrations/supabase/local-auth");
+    signOutLocal();
+    await supabase.auth.signOut().catch(() => undefined);
     navigate({ to: "/auth", replace: true });
   }
 
+  const items = [
+    { to: "/dashboard" as const, label: t.dash.overview, icon: LayoutDashboard, exact: true },
+    { to: "/dashboard/news" as const, label: t.dash.news, icon: Newspaper },
+    { to: "/dashboard/events" as const, label: t.dash.events, icon: CalendarDays },
+    { to: "/dashboard/life" as const, label: t.dash.life, icon: Sparkles },
+    { to: "/dashboard/gallery" as const, label: t.dash.gallery, icon: Images },
+    { to: "/dashboard/leadership" as const, label: t.dash.leadership, icon: Users },
+    { to: "/dashboard/messages" as const, label: t.dash.messages, icon: Mail },
+    { to: "/dashboard/settings" as const, label: t.dash.settings, icon: MapPinned },
+  ];
 
   return (
     <SidebarProvider>
@@ -79,13 +90,18 @@ function DashboardLayout() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={path === "/dashboard"} tooltip={t.dash.overview}>
-                    <Link to="/dashboard">
-                      <LayoutDashboard /> <span>{t.dash.overview}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {items.map((item) => {
+                  const active = item.exact ? path === item.to : path.startsWith(item.to);
+                  return (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
+                        <Link to={item.to}>
+                          <item.icon /> <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -113,7 +129,7 @@ function DashboardLayout() {
           <span className="text-sm text-muted-foreground">
             {t.dash.signedInAs} <b className="text-foreground">{staff?.email}</b>
           </span>
-          <div className="ml-auto">
+          <div className="ml-auto dash-lang">
             <LangSwitch />
           </div>
         </header>

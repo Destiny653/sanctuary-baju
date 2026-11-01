@@ -2,18 +2,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Menu, Search, UserRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { LangSwitch, useI18n } from "@/i18n";
 import { corpus, places } from "./data";
 import type { Notebook } from "./use-notebook";
-
-const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/news", label: "News" },
-  { href: "/events", label: "Events" },
-  { href: "/locations", label: "Locations" },
-  { href: "/contact", label: "Contact" },
-] as const;
-
 
 function Mark({ className }: { className?: string }) {
   return (
@@ -39,6 +30,20 @@ function scrollToId(id: string) {
   node.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 }
 
+function useNavLinks() {
+  const { t } = useI18n();
+  return [
+    { href: "/" as const, label: t.nav.home },
+    { href: "/about" as const, label: t.nav.about },
+    { href: "/leadership" as const, label: t.nav.leadership },
+    { href: "/gallery" as const, label: t.nav.gallery },
+    { href: "/news" as const, label: t.nav.news },
+    { href: "/events" as const, label: t.nav.events },
+    { href: "/locations" as const, label: t.nav.locations },
+    { href: "/contact" as const, label: t.nav.contact },
+  ];
+}
+
 export function Nav({
   onSearch,
   onBook,
@@ -46,6 +51,8 @@ export function Nav({
   onSearch: () => void;
   onBook: () => void;
 }) {
+  const { t } = useI18n();
+  const links = useNavLinks();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
 
@@ -63,24 +70,25 @@ export function Nav({
         <span>Mercy</span>
       </Link>
       <nav className="desk-nav" aria-label="Primary">
-        {LINKS.map((link) => (
+        {links.map((link) => (
           <Link key={link.href} to={link.href} activeOptions={{ exact: true }} activeProps={{ className: "is-current" }}>
             {link.label}
           </Link>
         ))}
       </nav>
       <div className="nav-tools">
+        <LangSwitch />
         <button type="button" className="search-pill" onClick={onSearch}>
-          <span>Search</span>
+          <span>{t.nav.search}</span>
           <Search strokeWidth={1.6} />
         </button>
-        <button type="button" className="icon-btn" onClick={onBook} aria-label="Your notebook">
+        <button type="button" className="icon-btn" onClick={onBook} aria-label={t.nav.notebook}>
           <UserRound strokeWidth={1.6} />
         </button>
         <button
           type="button"
           className="icon-btn menu-btn"
-          aria-label="Open menu"
+          aria-label={t.nav.menu}
           onClick={() => setMenu(true)}
         >
           <Menu strokeWidth={1.6} />
@@ -90,19 +98,26 @@ export function Nav({
         <Dialog.Portal>
           <Dialog.Overlay className="overlay" />
           <Dialog.Content className="menu-sheet" aria-describedby={undefined}>
-            <Dialog.Title className="sr-only">Menu</Dialog.Title>
-            <Dialog.Close className="icon-btn menu-close" aria-label="Close menu">
+            <Dialog.Title className="sr-only">{t.nav.menu}</Dialog.Title>
+            <Dialog.Close className="icon-btn menu-close" aria-label={t.nav.closeMenu}>
               <X strokeWidth={1.6} />
             </Dialog.Close>
             <nav className="menu-links" aria-label="Mobile">
-              {LINKS.map((link) => (
-                <Link key={link.href} to={link.href} activeOptions={{ exact: true }} activeProps={{ className: "is-current" }}
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  activeOptions={{ exact: true }}
+                  activeProps={{ className: "is-current" }}
                   onClick={() => setMenu(false)}
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
+            <div className="mt-8">
+              <LangSwitch />
+            </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
@@ -119,15 +134,21 @@ export function SearchDialog({
   onOpenChange: (open: boolean) => void;
   intentions: Notebook["intentions"];
 }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const ROUTE_OF: Record<string, "/" | "/locations" | "/contact" | "/gallery" | "/news" | "/events"> = {
+  const ROUTE_OF: Record<
+    string,
+    "/" | "/locations" | "/contact" | "/gallery" | "/news" | "/events" | "/about" | "/leadership"
+  > = {
     locations: "/locations",
     contact: "/contact",
     intentions: "/contact",
     gallery: "/gallery",
     news: "/news",
     events: "/events",
+    about: "/about",
+    leadership: "/leadership",
   };
 
   const results = useMemo(() => {
@@ -141,13 +162,13 @@ export function SearchDialog({
       })),
       ...intentions.map((item) => ({
         id: "intentions",
-        title: item.name || "An intention",
+        title: item.name || t.common.pilgrim,
         text: item.text,
       })),
     ];
     if (!q) return base.slice(0, 8);
     return base.filter((item) => (item.title + " " + item.text).toLowerCase().includes(q)).slice(0, 8);
-  }, [query, intentions]);
+  }, [query, intentions, t.common.pilgrim]);
 
   return (
     <Dialog.Root
@@ -161,21 +182,21 @@ export function SearchDialog({
         <Dialog.Overlay className="overlay" />
         <Dialog.Content className="search-sheet">
           <div className="sheet-top">
-            <Dialog.Description className="kicker">Search the house</Dialog.Description>
-            <Dialog.Close className="icon-btn is-ink" aria-label="Close search">
+            <Dialog.Description className="kicker">{t.search.kicker}</Dialog.Description>
+            <Dialog.Close className="icon-btn is-ink" aria-label={t.search.close}>
               <X strokeWidth={1.6} />
             </Dialog.Close>
           </div>
-          <Dialog.Title className="sr-only">Search</Dialog.Title>
+          <Dialog.Title className="sr-only">{t.nav.search}</Dialog.Title>
           <input
             className="search-input"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Chapel, vespers, gate"
+            placeholder={t.search.placeholder}
             autoFocus
           />
           <ul className="search-results">
-            {results.length === 0 && <li className="empty-note">Nothing under that name.</li>}
+            {results.length === 0 && <li className="empty-note">{t.search.empty}</li>}
             {results.map((item, i) => (
               <li key={item.title + item.text + i}>
                 <button
@@ -208,6 +229,7 @@ export function BookDialog({
   onOpenChange: (open: boolean) => void;
   book: Notebook;
 }) {
+  const { t } = useI18n();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -215,37 +237,33 @@ export function BookDialog({
         <Dialog.Content className="book-sheet">
           <div className="sheet-top">
             <div>
-              <Dialog.Description className="kicker">On this device</Dialog.Description>
-              <Dialog.Title className="sheet-title">Your notebook</Dialog.Title>
+              <Dialog.Description className="kicker">{t.book.kicker}</Dialog.Description>
+              <Dialog.Title className="sheet-title">{t.book.title}</Dialog.Title>
             </div>
-            <Dialog.Close className="icon-btn is-ink" aria-label="Close notebook">
+            <Dialog.Close className="icon-btn is-ink" aria-label={t.book.close}>
               <X strokeWidth={1.6} />
             </Dialog.Close>
           </div>
           <section className="book-block">
-            <h3>Intentions</h3>
-            {book.intentions.length === 0 && (
-              <p className="empty-note">Nothing written yet. The book in the nave is open.</p>
-            )}
+            <h3>{t.book.intentions}</h3>
+            {book.intentions.length === 0 && <p className="empty-note">{t.book.noIntentions}</p>}
             <ul className="book-list">
               {book.intentions.map((item) => (
                 <li key={item.id}>
                   <div>
-                    <strong>{item.name || "A pilgrim"}</strong>
+                    <strong>{item.name || t.common.pilgrim}</strong>
                     <p>{item.text}</p>
                   </div>
                   <button type="button" onClick={() => book.removeIntention(item.id)}>
-                    Remove
+                    {t.common.remove}
                   </button>
                 </li>
               ))}
             </ul>
           </section>
           <section className="book-block">
-            <h3>Word sent to the gate</h3>
-            {book.visits.length === 0 && (
-              <p className="empty-note">No visit noted. The door does not require one.</p>
-            )}
+            <h3>{t.book.visits}</h3>
+            {book.visits.length === 0 && <p className="empty-note">{t.book.noVisits}</p>}
             <ul className="book-list">
               {book.visits.map((item) => (
                 <li key={item.id}>
@@ -269,23 +287,68 @@ export function BookDialog({
 }
 
 export function Footer() {
+  const { t } = useI18n();
+  const year = new Date().getFullYear();
+
   return (
     <footer className="footer">
-      <div className="footer-brand">
-        <Mark className="mark" />
-        <p>Sanctuary of Our Lady of Mercy</p>
-      </div>
-      <nav aria-label="Footer">
-        {LINKS.map((link) => (
-          <Link key={link.href} to={link.href} activeOptions={{ exact: true }} activeProps={{ className: "is-current" }}>
-            {link.label}
+      <div className="footer-top">
+        <div className="footer-brand">
+          <Link className="footer-brand-link" to="/">
+            <Mark className="mark" />
+            <span>{t.footer.name}</span>
           </Link>
-        ))}
-      </nav>
-      <p className="footer-note">
-        Stillwater, north garden. Open every day. The afternoon of Good Friday is kept for the liturgy alone.
-        The house keeps no shop.
-      </p>
+          <p className="footer-tagline">{t.footer.tagline}</p>
+          <p className="footer-note">{t.footer.note}</p>
+        </div>
+
+        <div className="footer-cols">
+          <nav className="footer-col" aria-label={t.footer.explore}>
+            <h3>{t.footer.explore}</h3>
+            <Link to="/" activeOptions={{ exact: true }}>
+              {t.nav.home}
+            </Link>
+            <Link to="/about">{t.nav.about}</Link>
+            <Link to="/gallery">{t.nav.gallery}</Link>
+            <Link to="/news">{t.nav.news}</Link>
+            <Link to="/events">{t.nav.events}</Link>
+          </nav>
+
+          <nav className="footer-col" aria-label={t.footer.visit}>
+            <h3>{t.footer.visit}</h3>
+            <Link to="/locations">{t.nav.locations}</Link>
+            <Link to="/contact">{t.nav.contact}</Link>
+            <p className="footer-meta">
+              <span>{t.footer.hours}</span>
+              {t.footer.hoursText}
+            </p>
+          </nav>
+
+          <nav className="footer-col" aria-label={t.footer.administration}>
+            <h3>{t.footer.administration}</h3>
+            <Link to="/leadership">{t.nav.leadership}</Link>
+            <Link to="/auth" className="footer-staff">
+              {t.footer.staff}
+            </Link>
+            <p className="footer-meta">{t.footer.staffLead}</p>
+          </nav>
+
+          <div className="footer-col footer-contact">
+            <h3>{t.footer.contactTitle}</h3>
+            <p className="footer-meta">{t.footer.place}</p>
+            <Link className="footer-cta" to="/contact">
+              {t.nav.contact}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <p>
+          © {year} {t.footer.name}. {t.footer.rights}
+        </p>
+        <p>{t.footer.place}</p>
+      </div>
     </footer>
   );
 }

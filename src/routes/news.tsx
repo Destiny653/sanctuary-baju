@@ -7,18 +7,15 @@ import { art } from "@/components/sanctuary/art";
 import { formatDay, postsQuery, type Post } from "@/components/sanctuary/content";
 import { Tilt } from "@/components/sanctuary/motion";
 import { PageHero, Shell } from "@/components/sanctuary/shell";
-
-const TITLE = "News — Our Lady of Mercy";
-const DESC = "Latest news from the sanctuary: the chapel, the twin mountains and the pilgrim house.";
+import { pick, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/news")({
   loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery("news")),
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
+      { title: "News — Our Lady of Mercy" },
+      { name: "description", content: "Latest news from the sanctuary." },
+      { property: "og:title", content: "News — Our Lady of Mercy" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -27,6 +24,7 @@ export const Route = createFileRoute("/news")({
 });
 
 function NewsPage() {
+  const { t, lang } = useI18n();
   const { data: news } = useSuspenseQuery(postsQuery("news"));
   const [reading, setReading] = useState<Post | null>(null);
   const [first, ...rest] = news;
@@ -35,22 +33,22 @@ function NewsPage() {
       {() => (
         <>
           <PageHero
-            kicker="News"
-            title="Word from the hill"
-            lede="What has been built, blessed and begun at the sanctuary."
+            kicker={t.posts.newsKicker}
+            title={t.pages.newsHeroTitle}
+            lede={t.pages.newsHeroLead}
             images={[art.mountains, art.evangelCall, art.sanctuary, art.passionWay]}
           />
-          <section className="news band">
-            {!first && <p className="empty-note">No news yet. The hill is quiet.</p>}
+          <section className="news band band-snow">
+            {!first && <p className="empty-note">{t.pages.newsEmpty}</p>}
             {first && (
               <article className="news-lead" data-gsap="zoom">
                 {first.cover_url && <img src={first.cover_url} alt="" data-parallax="0.06" />}
                 <div className="news-lead-copy glass">
-                  <span className="tag">{formatDay(first.published_at)}</span>
-                  <h2 className="display-lg">{first.title_en}</h2>
-                  <p className="serif-lead">{first.excerpt_en}</p>
+                  <span className="tag">{formatDay(first.published_at, lang)}</span>
+                  <h2 className="display-lg">{pick(first, "title", lang)}</h2>
+                  <p className="serif-lead">{pick(first, "excerpt", lang)}</p>
                   <button className="pill" type="button" onClick={() => setReading(first)}>
-                    Read the story
+                    {t.pages.newsRead}
                   </button>
                 </div>
               </article>
@@ -60,9 +58,9 @@ function NewsPage() {
                 <Tilt key={n.id} className="news-card">
                   <button type="button" onClick={() => setReading(n)} data-gsap={i % 2 ? "right" : "left"}>
                     {n.cover_url && <img src={n.cover_url} alt="" loading="lazy" />}
-                    <span className="tag">{formatDay(n.published_at)}</span>
-                    <h3>{n.title_en}</h3>
-                    <p>{n.excerpt_en}</p>
+                    <span className="tag">{formatDay(n.published_at, lang)}</span>
+                    <h3>{pick(n, "title", lang)}</h3>
+                    <p>{pick(n, "excerpt", lang)}</p>
                   </button>
                 </Tilt>
               ))}
@@ -72,15 +70,17 @@ function NewsPage() {
             <Dialog.Portal>
               <Dialog.Overlay className="overlay" />
               <Dialog.Content className="reader" aria-describedby={undefined}>
-                <Dialog.Close className="icon-btn is-ink reader-close" aria-label="Close">
+                <Dialog.Close className="icon-btn is-ink reader-close" aria-label={t.common.close}>
                   <X strokeWidth={1.6} />
                 </Dialog.Close>
                 {reading?.cover_url && <img src={reading.cover_url} alt="" />}
-                <span className="tag">{reading && formatDay(reading.published_at)}</span>
-                <Dialog.Title className="display-lg">{reading?.title_en}</Dialog.Title>
-                {(reading?.body_en || reading?.excerpt_en || "").split("\n").map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
+                <span className="tag">{reading && formatDay(reading.published_at, lang)}</span>
+                <Dialog.Title className="display-lg">{reading ? pick(reading, "title", lang) : ""}</Dialog.Title>
+                {(reading ? pick(reading, "body", lang) || pick(reading, "excerpt", lang) : "")
+                  .split("\n")
+                  .map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
               </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>

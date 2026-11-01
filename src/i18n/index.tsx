@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import { en, type Dict } from "./en";
 import { fr } from "./fr";
 
@@ -55,21 +56,69 @@ export function useI18n() {
   return useContext(I18nContext);
 }
 
+/** Flag dropdown for EN / FR. */
 export function LangSwitch({ className = "" }: { className?: string }) {
   const { lang, setLang, t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const current = dictionaries[lang];
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <div className={"lang-switch " + className} role="group" aria-label={t.nav.language}>
-      {LANGS.map((code) => (
-        <button
-          key={code}
-          type="button"
-          className={code === lang ? "is-on" : ""}
-          aria-pressed={code === lang}
-          onClick={() => setLang(code)}
-        >
-          {dictionaries[code].langShort}
-        </button>
-      ))}
+    <div className={"lang-switch " + className} ref={root}>
+      <button
+        type="button"
+        className="lang-switch-btn"
+        aria-label={t.nav.language}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="flag" aria-hidden="true">
+          {current.langFlag}
+        </span>
+        <span>{current.langShort}</span>
+        <ChevronDown strokeWidth={1.8} className="h-3.5 w-3.5 opacity-70" />
+      </button>
+      {open && (
+        <ul className="lang-switch-menu" role="listbox" aria-label={t.nav.language}>
+          {LANGS.map((code) => {
+            const dict = dictionaries[code];
+            return (
+              <li key={code} role="option" aria-selected={code === lang}>
+                <button
+                  type="button"
+                  className={code === lang ? "is-on" : ""}
+                  onClick={() => {
+                    setLang(code);
+                    setOpen(false);
+                  }}
+                >
+                  <span className="flag" aria-hidden="true">
+                    {dict.langFlag}
+                  </span>
+                  <span>{dict.langName}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

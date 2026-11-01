@@ -105,6 +105,11 @@ export const corpus = [
     title: "Contact us",
     text: "Tell the gate house the day you are coming. There is no charge and no ticket.",
   },
+  {
+    id: "leadership",
+    title: "Administration",
+    text: "Priests, sisters and lay people who keep the sanctuary.",
+  },
 ];
 
 export const parties = ["1", "2", "3–5", "6–12", "A parish"];

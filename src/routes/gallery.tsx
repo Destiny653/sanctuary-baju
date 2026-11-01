@@ -1,24 +1,19 @@
-import * as Dialog from "@radix-ui/react-dialog";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { X } from "lucide-react";
-import { useState } from "react";
+import { useMemo } from "react";
+import FlexCarousel from "@/components/FlexCarousel";
+import Masonry from "@/components/Masonry";
 import { art } from "@/components/sanctuary/art";
-import { galleryQuery } from "@/components/sanctuary/content";
+import { GALLERY_HERO_STATIONS, LOCAL_GALLERY_SEGMENTS } from "@/components/sanctuary/gallery-local";
 import { SplitText } from "@/components/sanctuary/motion";
-import { PageHero, Shell } from "@/components/sanctuary/shell";
-
-const TITLE = "Gallery — Our Lady of Mercy";
-const DESC = "Albums of the sanctuary: the Passion of Christ, the rosary mysteries, the people at prayer.";
+import { Shell } from "@/components/sanctuary/shell";
+import { pick, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/gallery")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(galleryQuery),
   head: () => ({
     meta: [
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
+      { title: "Gallery — Our Lady of Mercy" },
+      { name: "description", content: "Albums of the sanctuary." },
+      { property: "og:title", content: "Gallery — Our Lady of Mercy" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -27,55 +22,103 @@ export const Route = createFileRoute("/gallery")({
 });
 
 function GalleryPage() {
-  const { data: albums } = useSuspenseQuery(galleryQuery);
-  const [open, setOpen] = useState<{ url: string; caption: string } | null>(null);
+  const { t, lang } = useI18n();
+
+  const heroItems = useMemo(
+    () =>
+      GALLERY_HERO_STATIONS.map((item) => ({
+        src: item.src,
+        alt: lang === "fr" ? item.title_fr : item.title_en,
+        title: lang === "fr" ? item.title_fr : item.title_en,
+        subtitle: lang === "fr" ? item.subtitle_fr : item.subtitle_en,
+      })),
+    [lang],
+  );
+
   return (
     <Shell>
       {() => (
-        <>
-          <PageHero
-            kicker="Gallery"
-            title="Seen in light"
-            lede="Every album of the house. Touch a painting to see it whole."
-            images={[art.passionCross, art.rosaryGlorious, art.worship, art.evangelSermon]}
-          />
-          {albums.map((album, ai) => (
-            <section key={album.id} className="album band">
-              <header className="album-head">
-                <span className="album-n">{String(ai + 1).padStart(2, "0")}</span>
-                <SplitText text={album.title_en} className="display-lg" />
-                {album.description_en && <p className="serif-lead">{album.description_en}</p>}
-              </header>
-              <div className="masonry">
-                {album.images.map((img, i) => (
-                  <button
-                    type="button"
-                    key={img.id}
-                    className="masonry-item"
-                    data-gsap={i % 3 === 0 ? "zoom" : undefined}
-                    onClick={() => setOpen({ url: img.url, caption: img.caption_en })}
-                  >
-                    <img src={img.url} alt={img.caption_en || album.title_en} loading="lazy" />
-                    {img.caption_en && <span>{img.caption_en}</span>}
-                  </button>
-                ))}
-              </div>
-            </section>
-          ))}
-          <Dialog.Root open={!!open} onOpenChange={(v) => !v && setOpen(null)}>
-            <Dialog.Portal>
-              <Dialog.Overlay className="overlay" />
-              <Dialog.Content className="lightbox" aria-describedby={undefined}>
-                <Dialog.Title className="sr-only">{open?.caption || "Image"}</Dialog.Title>
-                <Dialog.Close className="icon-btn lightbox-close" aria-label="Close">
-                  <X strokeWidth={1.6} />
-                </Dialog.Close>
-                {open && <img src={open.url} alt={open.caption} />}
-                {open?.caption && <p>{open.caption}</p>}
-              </Dialog.Content>
-            </Dialog.Portal>
-          </Dialog.Root>
-        </>
+        <div className="gallery-page">
+          <section className="gallery-hero" data-scroll>
+            <img className="gallery-hero-sky ken" src={art.heaven} alt="" />
+            <div className="gallery-hero-sun" aria-hidden="true" />
+            <div className="gallery-hero-rays" aria-hidden="true" />
+            <div className="gallery-hero-wash" aria-hidden="true" />
+            <div className="gallery-hero-copy">
+              <p className="kicker">{t.gallery.kicker}</p>
+              <SplitText text={t.gallery.title} className="display-xl" />
+              <p className="serif-lead">{t.gallery.lead}</p>
+            </div>
+            <div className="gallery-hero-reel">
+              <FlexCarousel
+                items={heroItems}
+                preset="liquid"
+                intro="rise"
+                cardHeight={0.88}
+                gap={20}
+                squeeze={0.08}
+                focusOnClick
+                captions
+                fit="portrait"
+                radius={18}
+                lensWidth={0.9}
+                lensHeight={1.4}
+                tilt={52}
+                roundness={1}
+                bend={0.28}
+                reach={0.42}
+                curl="twist"
+                dispersion={0.4}
+                liquid={0}
+                followCursor={false}
+                autoplay={false}
+                interval={4}
+                captureWheel={false}
+              />
+            </div>
+          </section>
+
+          {LOCAL_GALLERY_SEGMENTS.map((album, ai) => {
+            const title = pick(album, "title", lang);
+            const description = pick(album, "description", lang);
+            const items = album.images.map((img) => ({
+              id: img.id,
+              img: img.img,
+              title: pick(img, "title", lang),
+              alt: img.alt,
+            }));
+
+            return (
+              <section key={album.id} className="album album-segment band">
+                <header className="album-head">
+                  <span className="album-n">{String(ai + 1).padStart(2, "0")}</span>
+                  {album.year != null && <p className="album-date">{album.year}</p>}
+                  <SplitText text={title} className="display-lg" />
+                  {description && <p className="serif-lead">{description}</p>}
+                </header>
+                <Masonry
+                  items={items}
+                  columnWidth={240}
+                  gap={12}
+                  radius={14}
+                  animateFrom="bottom"
+                  hoverEffect="zoom"
+                  captions="hover"
+                  lightbox
+                  draggable={false}
+                  columns="auto"
+                  stagger={0.05}
+                  duration={0.6}
+                  bounce={0.15}
+                  blurToFocus
+                  focusOnHover={false}
+                  parallax={0}
+                  revealOnScroll
+                />
+              </section>
+            );
+          })}
+        </div>
       )}
     </Shell>
   );

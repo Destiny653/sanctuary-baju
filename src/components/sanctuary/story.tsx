@@ -1,48 +1,46 @@
 import { art } from "./art";
 import { useState, type CSSProperties } from "react";
-import { hours, parties, places } from "./data";
+import { places } from "./data";
 import { MaryFigure } from "./mary";
 import { Petals, Shards } from "./shards";
 import type { Notebook } from "./use-notebook";
 import InfiniteSpiral from "../InfiniteSpiral";
+import { useI18n } from "@/i18n";
 
 const delay = (ms: number) => ({ ["--d" as string]: `${ms}ms` }) as CSSProperties;
 
 export function About() {
+  const { t } = useI18n();
   return (
-    <section className="about band" id="about" data-scroll>
+    <section className="about band band-snow" id="about" data-scroll>
       <p className="drift-word" aria-hidden="true">
         Sanctuary
       </p>
       <div className="about-grid">
         <div>
           <p className="kicker" data-reveal>
-            About us
+            {t.about.kicker}
           </p>
           <h2 className="display-lg" data-reveal style={delay(80)}>
-            A house on still water
+            {t.about.title}
           </h2>
           <p className="serif-lead" data-reveal style={delay(160)}>
-            The sanctuary stands on a green hill above a pool that rarely takes the wind, palms on
-            one side and an old baobab on the other. It was opened so anyone could sit in a finished
-            silence.
+            {t.about.lead}
           </p>
           <p className="body-copy" data-reveal style={delay(240)}>
-            The house keeps the hours. It does not keep an account. There is no admission, no
-            reserved place set aside for payment, and nothing sold along the cloister. If you need
-            a chair, there is a chair.
+            {t.about.body}
           </p>
           <blockquote className="pull" data-reveal style={delay(320)}>
-            Come as you are. The house is not keeping score.
+            {t.about.quote}
           </blockquote>
         </div>
         <figure className="about-figure glass-frame" data-reveal style={delay(120)}>
-          <img src={art.sanctuary} alt="The white chapel on its hill, reflected in the still pool" loading="lazy" />
-          <figcaption>The chapel, from the south walk</figcaption>
+          <img src={art.sanctuary} alt={t.about.figureAlt} loading="lazy" />
+          <figcaption>{t.about.figureCaption}</figcaption>
         </figure>
       </div>
       <ol className="hours">
-        {hours.map((hour, i) => (
+        {t.about.hours.map((hour, i) => (
           <li key={hour.time} className="glass" data-reveal style={delay(i * 90)}>
             <span className="hours-time">{hour.time}</span>
             <span className="hours-name">{hour.name}</span>
@@ -56,16 +54,17 @@ export function About() {
 
 /** Tall scroll scene: the word grows while carved figures drift through it. */
 export function Interlude() {
+  const { t } = useI18n();
   return (
-    <section className="interlude" id="mercy" data-scroll="sticky" aria-label="Mercy">
+    <section className="interlude band-sky" id="mercy" data-scroll="sticky" aria-label={t.home.interludeWord}>
       <div className="interlude-stage">
         <h2 className="interlude-word" aria-hidden="true">
-          Mercy
+          {t.home.interludeWord}
         </h2>
         <img className="fly fly-a" src={art.face} alt="" loading="lazy" />
         <img className="fly fly-b" src={art.hands} alt="" loading="lazy" />
         <img className="fly fly-c" src={art.angels} alt="" loading="lazy" />
-        <p className="interlude-note">Wider than the water. Open before the first bell.</p>
+        <p className="interlude-note">{t.home.interludeNote}</p>
       </div>
     </section>
   );
@@ -73,7 +72,7 @@ export function Interlude() {
 
 export function Way() {
   return (
-    <section className="way" id="way" data-scroll>
+    <section className="way band-snow" id="way" data-scroll>
       <img className="fill ken" src={art.hills} alt="" loading="lazy" />
       <div className="way-shade" />
       <Shards />
@@ -103,39 +102,62 @@ export function Way() {
   );
 }
 
-const MYSTERY_IMAGES = Array.from({ length: 20 }, (_, i) => {
-  const names = [
-    "Annunciation",
-    "Visitation",
-    "Nativity",
-    "Presentation_in_the_Temple",
-    "Finding_of_Jesus_in_the_Temple",
-    "Baptism_of_Jesus",
-    "Wedding_at_Cana",
-    "Proclamation_of_the_Kingdom",
-    "Transfiguration",
-    "Institution_of_the_Eucharist",
-    "Agony_in_the_Garden",
-    "Scourging_at_the_Pillar",
-    "Crowning_with_Thorns",
-    "Carrying_of_the_Cross",
-    "Crucifixion",
-    "Resurrection",
-    "Ascension",
-    "Descent_of_the_Holy_Spirit",
-    "Assumption_of_Mary",
-    "Coronation_of_Mary",
-  ];
+const MYSTERY_NAMES = [
+  "Annunciation",
+  "Visitation",
+  "Nativity",
+  "Presentation_in_the_Temple",
+  "Finding_of_Jesus_in_the_Temple",
+  "Baptism_of_Jesus",
+  "Wedding_at_Cana",
+  "Proclamation_of_the_Kingdom",
+  "Transfiguration",
+  "Institution_of_the_Eucharist",
+  "Agony_in_the_Garden",
+  "Scourging_at_the_Pillar",
+  "Crowning_with_Thorns",
+  "Carrying_of_the_Cross",
+  "Crucifixion",
+  "Resurrection",
+  "Ascension",
+  "Descent_of_the_Holy_Spirit",
+  "Assumption_of_Mary",
+  "Coronation_of_Mary",
+] as const;
+
+const MYSTERY_IMAGES: { src: string; alt: string }[] = MYSTERY_NAMES.map((name, i) => {
   const num = String(i + 1).padStart(2, "0");
   return {
-    src: `/assets/mysteries/${num}_${names[i]}.png`,
-    alt: names[i]?.replace(/_/g, " "),
+    src: `/assets/mysteries/${num}_${name}.png`,
+    alt: name.replace(/_/g, " "),
   };
 });
 
-export function Descent() {
+function DescentCopy() {
+  const { t } = useI18n();
   return (
-    <section className="descent" id="descent" data-scroll>
+    <div className="descent-copy glass" data-reveal>
+      <p className="kicker">{t.home.weaponKicker}</p>
+      <h2 className="display-lg">{t.home.weaponTitle}</h2>
+      <p className="body-copy">
+        <em>{t.home.weaponQuote1}</em>
+        <br />
+        <span className="cite">{t.home.weaponCite1}</span>
+      </p>
+      <p className="body-copy">{t.home.weaponBody}</p>
+      <p className="body-copy">
+        <em>{t.home.weaponQuote2}</em>
+        <br />
+        <span className="cite">{t.home.weaponCite2}</span>
+      </p>
+    </div>
+  );
+}
+
+export function Descent() {
+  const { t } = useI18n();
+  return (
+    <section className="descent band-sky" id="descent" data-scroll>
       <img className="fill ken" src={art.heaven} alt="" loading="lazy" />
       <div className="rays" aria-hidden="true" />
       <div className="halo" aria-hidden="true" />
@@ -161,31 +183,11 @@ export function Descent() {
           pauseOnHover
           imageFit="cover"
           centerContent={
-            <MaryFigure
-              className="descent-figure-center"
-              alt="Mary lowered through a field of pale cloud, a gold ring turning behind her head"
-            />
+            <MaryFigure className="descent-figure-center" alt={t.home.descentAlt} />
           }
         />
       </div>
-      <div className="descent-copy glass" data-reveal>
-        <p className="kicker">The rosary</p>
-        <h2 className="display-lg">A weapon, not a decoration</h2>
-        <p className="body-copy">
-          <em>"The prayer of a righteous person is powerful and effective."</em>
-          <br /><span className="cite">James 5:16</span>
-        </p>
-        <p className="body-copy">
-          The rosary breaks strongholds. It has turned battles, ended plagues, and
-          brought peace to households that had none. It is not recitation — it is
-          intercession. Mary stood at the cross when others fled. She knows what to
-          carry to God and how.
-        </p>
-        <p className="body-copy">
-          <em>"Ask and it will be given to you; seek and you will find."</em>
-          <br /><span className="cite">Matthew 7:7</span>
-        </p>
-      </div>
+      <DescentCopy />
     </section>
   );
 }
@@ -221,21 +223,19 @@ export function Locations() {
 }
 
 export function Intentions({ book }: { book: Notebook }) {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [error, setError] = useState("");
 
   return (
-    <section className="intentions band" id="intentions">
+    <section className="intentions band band-snow" id="intentions">
       <Shards />
       <div className="intent-grid">
         <div data-reveal>
-          <p className="kicker">The book</p>
-          <h2 className="display-lg">Leave a name</h2>
-          <p className="serif-lead">
-            Write what you came with. It is kept in the notebook on this device, not sent anywhere,
-            and not read aloud.
-          </p>
+          <p className="kicker">{t.intentions.kicker}</p>
+          <h2 className="display-lg">{t.intentions.title}</h2>
+          <p className="serif-lead">{t.intentions.lead}</p>
         </div>
         <form
           className="stack-form glass"
@@ -244,7 +244,7 @@ export function Intentions({ book }: { book: Notebook }) {
           onSubmit={(event) => {
             event.preventDefault();
             if (text.trim().length < 3) {
-              setError("A few words are enough, but not fewer than that.");
+              setError(t.intentions.tooShort);
               return;
             }
             book.addIntention(name, text);
@@ -254,7 +254,7 @@ export function Intentions({ book }: { book: Notebook }) {
           }}
         >
           <label>
-            Name, if you wish
+            {t.intentions.name}
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -263,7 +263,7 @@ export function Intentions({ book }: { book: Notebook }) {
             />
           </label>
           <label>
-            Intention
+            {t.intentions.text}
             <textarea
               value={text}
               onChange={(event) => setText(event.target.value)}
@@ -274,124 +274,22 @@ export function Intentions({ book }: { book: Notebook }) {
           </label>
           {error && <p className="form-error">{error}</p>}
           <button className="pill" type="submit">
-            Write it
+            {t.intentions.submit}
           </button>
         </form>
       </div>
       <ul className="intention-list">
-        {book.intentions.length === 0 && (
-          <li className="empty-note">The book is open. The first line can be yours.</li>
-        )}
+        {book.intentions.length === 0 && <li className="empty-note">{t.intentions.empty}</li>}
         {book.intentions.map((item) => (
           <li key={item.id} className="glass">
-            <strong>{item.name || "A pilgrim"}</strong>
+            <strong>{item.name || t.common.pilgrim}</strong>
             <p>{item.text}</p>
             <button type="button" onClick={() => book.removeIntention(item.id)}>
-              Remove
+              {t.common.remove}
             </button>
           </li>
         ))}
       </ul>
-    </section>
-  );
-}
-
-export function Visit({ book }: { book: Notebook }) {
-  const [name, setName] = useState("");
-  const [day, setDay] = useState("");
-  const [party, setParty] = useState<string>(parties[0] ?? "1");
-  const [note, setNote] = useState("");
-  const [sent, setSent] = useState(false);
-
-  if (sent) {
-    return (
-      <section className="visit band" id="contact">
-        <div className="glass visit-done">
-          <p className="kicker">Contact us</p>
-          <h2 className="display-lg">The gate will be open</h2>
-          <p className="serif-lead">
-            Come to the gate house on the day you named. A chair will be there if we have one. You
-            will not be asked for anything at the door.
-          </p>
-          <button className="pill" type="button" onClick={() => setSent(false)}>
-            Write another
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="visit band" id="contact">
-      <div className="visit-grid">
-        <div data-reveal>
-          <p className="kicker">Contact us</p>
-          <h2 className="display-lg">Tell us the day</h2>
-          <p className="serif-lead">
-            Write only so we can set out chairs. You will not be charged. There is no ticket, no
-            reserved seat for a fee, and no collection at the door.
-          </p>
-        </div>
-        <form
-          className="stack-form glass"
-          data-reveal
-          style={delay(120)}
-          onSubmit={(event) => {
-            event.preventDefault();
-            book.addVisit({
-              name: name.trim(),
-              day,
-              party,
-              note: note.trim(),
-            });
-            setSent(true);
-            setName("");
-            setDay("");
-            setParty(parties[0] ?? "1");
-            setNote("");
-          }}
-        >
-          <label>
-            Your name
-            <input
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              maxLength={80}
-              autoComplete="name"
-            />
-          </label>
-          <label>
-            Day
-            <input
-              type="date"
-              value={day}
-              onChange={(event) => setDay(event.target.value)}
-              required
-            />
-          </label>
-          <label>
-            How many
-            <select value={party} onChange={(event) => setParty(event.target.value)}>
-              {parties.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            A note, if needed
-            <textarea
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              maxLength={240}
-              rows={3}
-            />
-          </label>
-          <button className="pill" type="submit">
-            Send word
-          </button>
-        </form>
-      </div>
     </section>
   );
 }

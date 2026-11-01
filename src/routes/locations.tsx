@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { art } from "@/components/sanctuary/art";
-import { hours } from "@/components/sanctuary/data";
+import { LocationMap } from "@/components/sanctuary/location-map";
 import { SplitText } from "@/components/sanctuary/motion";
 import { PageHero, Shell } from "@/components/sanctuary/shell";
 import { Locations } from "@/components/sanctuary/story";
+import { useI18n } from "@/i18n";
 
 const TITLE = "Locations — Our Lady of Mercy";
 const DESC = "The chapel, the garden oratory, the upper room, the gate house and the twin mountains of Mary and Calvary.";
@@ -23,37 +24,39 @@ export const Route = createFileRoute("/locations")({
 });
 
 function LocationsPage() {
+  const { t } = useI18n();
   return (
     <Shell>
       {() => (
         <>
           <PageHero
-            kicker="Locations"
-            title="Where the house stands"
-            lede="Four rooms above still water, and two mountains beside a waterfall."
+            kicker={t.locations.kicker}
+            title={t.locations.title}
+            lede={t.locations.lead}
             images={[art.sanctuary, art.mountains, art.hills, art.heaven]}
           />
           <Locations />
-          <section className="mountains band">
-            <img className="mountains-img" src={art.mountains} alt="The twin mountains with a waterfall between them" loading="lazy" data-gsap="zoom" />
+          <LocationMap />
+          <section className="mountains band band-sky">
+            <img className="mountains-img" src={art.mountains} alt={t.mountains.imageAlt} loading="lazy" data-gsap="zoom" />
             <div className="mountains-copy">
-              <SplitText text="The twin mountains" className="display-xl" />
+              <SplitText text={t.mountains.title} className="display-xl" />
               <div className="mountains-cols">
                 <div className="glass" data-gsap="left">
-                  <h3>Mount of Mary</h3>
-                  <p>Four paths, one for each set of rosary mysteries: joyful, luminous, sorrowful and glorious.</p>
+                  <h3>{t.mountains.femaleTitle}</h3>
+                  <p>{t.mountains.femaleText}</p>
                 </div>
                 <div className="glass" data-gsap="right">
-                  <h3>Mount of Calvary</h3>
-                  <p>Fourteen stations of the cross climb to the summit, painted with the Passion of Christ.</p>
+                  <h3>{t.mountains.maleTitle}</h3>
+                  <p>{t.mountains.maleText}</p>
                 </div>
               </div>
             </div>
           </section>
-          <section className="hours-band band">
-            <p className="kicker">The hours of the day</p>
+          <section className="hours-band band band-snow">
+            <p className="kicker">{t.about.hoursKicker}</p>
             <ol className="hours-row">
-              {hours.map((h) => (
+              {t.about.hours.map((h) => (
                 <li key={h.time} className="glass" data-gsap>
                   <b>{h.time}</b>
                   <strong>{h.name}</strong>

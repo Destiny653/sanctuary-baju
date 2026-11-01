@@ -1,57 +1,36 @@
-import angels from "@/assets/art/angels-af.webp.asset.json";
-import christ from "@/assets/art/christ-af.webp.asset.json";
-import dawn from "@/assets/art/dawn.jpg.asset.json";
-import evangelCall from "@/assets/art/evangel-call.jpg.asset.json";
-import evangelHeal from "@/assets/art/evangel-heal.jpg.asset.json";
-import evangelSermon from "@/assets/art/evangel-sermon.jpg.asset.json";
-import face from "@/assets/art/face-af.webp.asset.json";
-import hands from "@/assets/art/hands-af.webp.asset.json";
-import heaven from "@/assets/art/heaven.jpg.asset.json";
-import hills from "@/assets/art/hills-af.webp.asset.json";
-import mary from "@/assets/art/mary-af.webp.asset.json";
-import passionAgony from "@/assets/art/passion-agony.webp.asset.json";
-import passionCross from "@/assets/art/passion-cross.webp.asset.json";
-import passionPieta from "@/assets/art/passion-pieta.webp.asset.json";
-import passionSimon from "@/assets/art/passion-simon.webp.asset.json";
-import passionThorns from "@/assets/art/passion-thorns.webp.asset.json";
-import passionTomb from "@/assets/art/passion-tomb.webp.asset.json";
-import passionWay from "@/assets/art/passion-way.webp.asset.json";
-import rosaryGlorious from "@/assets/art/rosary-glorious.webp.asset.json";
-import rosaryJoyful from "@/assets/art/rosary-joyful.webp.asset.json";
-import rosaryLuminous from "@/assets/art/rosary-luminous.webp.asset.json";
-import sanctuary from "@/assets/art/sanctuary-af.webp.asset.json";
-import mountains from "@/assets/art/twin-mountains.webp.asset.json";
-import worship from "@/assets/art/worship-af.webp.asset.json";
-
 /**
- * Site artwork. Figures (mary, christ, angels) are transparent cut-outs so they
- * float over the glass layers; the rest are full-bleed paintings.
+ * Site artwork — all paths are local under /public so the site works offline.
+ * Lovable Cloud asset pointers are intentionally not used here.
  */
+const M = "/assets/mysteries";
+const S = "/assets/stations-cross";
+const I = "/assets/imgs";
+
 export const art = {
-  angels: "/assets/imgs/angels-af.png",
-  christ: christ.url,
-  dawn: dawn.url,
-  face: face.url,
-  hands: hands.url,
-  heaven: "/assets/imgs/heaven.jpg",
-  hills: hills.url,
-  mary: "/assets/imgs/mary-af.png",
-  sanctuary: sanctuary.url,
-  worship: worship.url,
-  mountains: mountains.url,
-  passionAgony: passionAgony.url,
-  passionThorns: passionThorns.url,
-  passionWay: passionWay.url,
-  passionSimon: passionSimon.url,
-  passionCross: passionCross.url,
-  passionPieta: passionPieta.url,
-  passionTomb: passionTomb.url,
-  evangelSermon: evangelSermon.url,
-  evangelCall: evangelCall.url,
-  evangelHeal: evangelHeal.url,
-  rosaryJoyful: rosaryJoyful.url,
-  rosaryLuminous: rosaryLuminous.url,
-  rosaryGlorious: rosaryGlorious.url,
+  angels: `${I}/angels-af.png`,
+  christ: `${M}/15_Crucifixion.png`,
+  dawn: `${I}/heaven.jpg`,
+  face: `${M}/06_Baptism_of_Jesus.png`,
+  hands: `${M}/10_Institution_of_the_Eucharist.png`,
+  heaven: `${I}/heaven.jpg`,
+  hills: `${M}/03_Nativity.png`,
+  mary: `${I}/mary-af.png`,
+  sanctuary: `${M}/19_Assumption_of_Mary.png`,
+  worship: `${M}/20_Coronation_of_Mary.png`,
+  mountains: `${M}/14_Carrying_of_the_Cross.png`,
+  passionAgony: `${M}/11_Agony_in_the_Garden.png`,
+  passionThorns: `${M}/13_Crowning_with_Thorns.png`,
+  passionWay: `${S}/Station_02.png`,
+  passionSimon: `${S}/Station_05.png`,
+  passionCross: `${M}/15_Crucifixion.png`,
+  passionPieta: `${S}/Station_13.png`,
+  passionTomb: `${S}/Station_14.png`,
+  evangelSermon: `${M}/08_Proclamation_of_the_Kingdom.png`,
+  evangelCall: `${M}/06_Baptism_of_Jesus.png`,
+  evangelHeal: `${M}/07_Wedding_at_Cana.png`,
+  rosaryJoyful: `${M}/01_Annunciation.png`,
+  rosaryLuminous: `${M}/09_Transfiguration.png`,
+  rosaryGlorious: `${M}/16_Resurrection.png`,
 };
 
 export const passion = [
@@ -65,7 +44,19 @@ export const passion = [
 ];
 
 export const evangel = [
-  { src: art.evangelSermon, title: "The Sermon on the Mount", text: "Blessed are the poor in spirit. He sat on the hill and the people sat with him." },
-  { src: art.evangelCall, title: "The Call by the Lake", text: "Come, follow me. The nets were left on the shore at dawn." },
-  { src: art.evangelHeal, title: "He Blesses the Children", text: "Let the little ones come to me. The village gathered at the red-earth road." },
+  {
+    src: art.evangelSermon,
+    title: "The Sermon on the Mount",
+    text: "Blessed are the poor in spirit. He sat on the hill and the people sat with him.",
+  },
+  {
+    src: art.evangelCall,
+    title: "The Call by the Lake",
+    text: "Come, follow me. The nets were left on the shore at dawn.",
+  },
+  {
+    src: art.evangelHeal,
+    title: "He Blesses the Children",
+    text: "Let the little ones come to me. The village gathered at the red-earth road.",
+  },
 ];

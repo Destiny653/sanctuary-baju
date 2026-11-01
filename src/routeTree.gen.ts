@@ -11,14 +11,23 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as LeadershipRouteImport } from './routes/leadership'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardEventsRouteImport } from './routes/_authenticated/dashboard.events'
+import { Route as AuthenticatedDashboardGalleryRouteImport } from './routes/_authenticated/dashboard.gallery'
+import { Route as AuthenticatedDashboardLeadershipRouteImport } from './routes/_authenticated/dashboard.leadership'
+import { Route as AuthenticatedDashboardLifeRouteImport } from './routes/_authenticated/dashboard.life'
+import { Route as AuthenticatedDashboardMessagesRouteImport } from './routes/_authenticated/dashboard.messages'
+import { Route as AuthenticatedDashboardNewsRouteImport } from './routes/_authenticated/dashboard.news'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -47,6 +61,11 @@ const EventsRoute = EventsRouteImport.update({
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadershipRoute = LeadershipRouteImport.update({
+  id: '/leadership',
+  path: '/leadership',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocationsRoute = LocationsRouteImport.update({
@@ -70,84 +89,182 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardEventsRoute =
+  AuthenticatedDashboardEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardGalleryRoute =
+  AuthenticatedDashboardGalleryRouteImport.update({
+    id: '/gallery',
+    path: '/gallery',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardLeadershipRoute =
+  AuthenticatedDashboardLeadershipRouteImport.update({
+    id: '/leadership',
+    path: '/leadership',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardLifeRoute =
+  AuthenticatedDashboardLifeRouteImport.update({
+    id: '/life',
+    path: '/life',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardMessagesRoute =
+  AuthenticatedDashboardMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardNewsRoute =
+  AuthenticatedDashboardNewsRouteImport.update({
+    id: '/news',
+    path: '/news',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/gallery': typeof GalleryRoute
+  '/leadership': typeof LeadershipRoute
   '/locations': typeof LocationsRoute
   '/news': typeof NewsRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/dashboard/events': typeof AuthenticatedDashboardEventsRoute
+  '/dashboard/gallery': typeof AuthenticatedDashboardGalleryRoute
+  '/dashboard/leadership': typeof AuthenticatedDashboardLeadershipRoute
+  '/dashboard/life': typeof AuthenticatedDashboardLifeRoute
+  '/dashboard/messages': typeof AuthenticatedDashboardMessagesRoute
+  '/dashboard/news': typeof AuthenticatedDashboardNewsRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/gallery': typeof GalleryRoute
+  '/leadership': typeof LeadershipRoute
   '/locations': typeof LocationsRoute
   '/news': typeof NewsRoute
+  '/dashboard/events': typeof AuthenticatedDashboardEventsRoute
+  '/dashboard/gallery': typeof AuthenticatedDashboardGalleryRoute
+  '/dashboard/leadership': typeof AuthenticatedDashboardLeadershipRoute
+  '/dashboard/life': typeof AuthenticatedDashboardLifeRoute
+  '/dashboard/messages': typeof AuthenticatedDashboardMessagesRoute
+  '/dashboard/news': typeof AuthenticatedDashboardNewsRoute
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/gallery': typeof GalleryRoute
+  '/leadership': typeof LeadershipRoute
   '/locations': typeof LocationsRoute
   '/news': typeof NewsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/dashboard/events': typeof AuthenticatedDashboardEventsRoute
+  '/_authenticated/dashboard/gallery': typeof AuthenticatedDashboardGalleryRoute
+  '/_authenticated/dashboard/leadership': typeof AuthenticatedDashboardLeadershipRoute
+  '/_authenticated/dashboard/life': typeof AuthenticatedDashboardLifeRoute
+  '/_authenticated/dashboard/messages': typeof AuthenticatedDashboardMessagesRoute
+  '/_authenticated/dashboard/news': typeof AuthenticatedDashboardNewsRoute
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/contact'
     | '/events'
     | '/gallery'
+    | '/leadership'
     | '/locations'
     | '/news'
     | '/dashboard'
+    | '/dashboard/events'
+    | '/dashboard/gallery'
+    | '/dashboard/leadership'
+    | '/dashboard/life'
+    | '/dashboard/messages'
+    | '/dashboard/news'
+    | '/dashboard/settings'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/contact'
     | '/events'
     | '/gallery'
+    | '/leadership'
     | '/locations'
     | '/news'
+    | '/dashboard/events'
+    | '/dashboard/gallery'
+    | '/dashboard/leadership'
+    | '/dashboard/life'
+    | '/dashboard/messages'
+    | '/dashboard/news'
+    | '/dashboard/settings'
     | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
     | '/contact'
     | '/events'
     | '/gallery'
+    | '/leadership'
     | '/locations'
     | '/news'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dashboard/events'
+    | '/_authenticated/dashboard/gallery'
+    | '/_authenticated/dashboard/leadership'
+    | '/_authenticated/dashboard/life'
+    | '/_authenticated/dashboard/messages'
+    | '/_authenticated/dashboard/news'
+    | '/_authenticated/dashboard/settings'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
   GalleryRoute: typeof GalleryRoute
+  LeadershipRoute: typeof LeadershipRoute
   LocationsRoute: typeof LocationsRoute
   NewsRoute: typeof NewsRoute
 }
@@ -166,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -196,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leadership': {
+      id: '/leadership'
+      path: '/leadership'
+      fullPath: '/leadership'
+      preLoaderRoute: typeof LeadershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations': {
       id: '/locations'
       path: '/locations'
@@ -224,15 +355,79 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/events': {
+      id: '/_authenticated/dashboard/events'
+      path: '/events'
+      fullPath: '/dashboard/events'
+      preLoaderRoute: typeof AuthenticatedDashboardEventsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/gallery': {
+      id: '/_authenticated/dashboard/gallery'
+      path: '/gallery'
+      fullPath: '/dashboard/gallery'
+      preLoaderRoute: typeof AuthenticatedDashboardGalleryRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/leadership': {
+      id: '/_authenticated/dashboard/leadership'
+      path: '/leadership'
+      fullPath: '/dashboard/leadership'
+      preLoaderRoute: typeof AuthenticatedDashboardLeadershipRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/life': {
+      id: '/_authenticated/dashboard/life'
+      path: '/life'
+      fullPath: '/dashboard/life'
+      preLoaderRoute: typeof AuthenticatedDashboardLifeRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/messages': {
+      id: '/_authenticated/dashboard/messages'
+      path: '/messages'
+      fullPath: '/dashboard/messages'
+      preLoaderRoute: typeof AuthenticatedDashboardMessagesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/news': {
+      id: '/_authenticated/dashboard/news'
+      path: '/news'
+      fullPath: '/dashboard/news'
+      preLoaderRoute: typeof AuthenticatedDashboardNewsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
 interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardEventsRoute: typeof AuthenticatedDashboardEventsRoute
+  AuthenticatedDashboardGalleryRoute: typeof AuthenticatedDashboardGalleryRoute
+  AuthenticatedDashboardLeadershipRoute: typeof AuthenticatedDashboardLeadershipRoute
+  AuthenticatedDashboardLifeRoute: typeof AuthenticatedDashboardLifeRoute
+  AuthenticatedDashboardMessagesRoute: typeof AuthenticatedDashboardMessagesRoute
+  AuthenticatedDashboardNewsRoute: typeof AuthenticatedDashboardNewsRoute
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
+    AuthenticatedDashboardEventsRoute: AuthenticatedDashboardEventsRoute,
+    AuthenticatedDashboardGalleryRoute: AuthenticatedDashboardGalleryRoute,
+    AuthenticatedDashboardLeadershipRoute:
+      AuthenticatedDashboardLeadershipRoute,
+    AuthenticatedDashboardLifeRoute: AuthenticatedDashboardLifeRoute,
+    AuthenticatedDashboardMessagesRoute: AuthenticatedDashboardMessagesRoute,
+    AuthenticatedDashboardNewsRoute: AuthenticatedDashboardNewsRoute,
+    AuthenticatedDashboardSettingsRoute: AuthenticatedDashboardSettingsRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
 
@@ -255,10 +450,12 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
   GalleryRoute: GalleryRoute,
+  LeadershipRoute: LeadershipRoute,
   LocationsRoute: LocationsRoute,
   NewsRoute: NewsRoute,
 }

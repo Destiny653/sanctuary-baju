@@ -47,27 +47,33 @@ export type Database = {
           description_en: string
           description_fr: string
           id: string
+          segment_date: string | null
           sort: number
           title_en: string
           title_fr: string
+          year: number | null
         }
         Insert: {
           created_at?: string
           description_en?: string
           description_fr?: string
           id?: string
+          segment_date?: string | null
           sort?: number
           title_en?: string
           title_fr?: string
+          year?: number | null
         }
         Update: {
           created_at?: string
           description_en?: string
           description_fr?: string
           id?: string
+          segment_date?: string | null
           sort?: number
           title_en?: string
           title_fr?: string
+          year?: number | null
         }
         Relationships: []
       }
@@ -208,6 +214,24 @@ export type Database = {
           title_fr?: string
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          value: Json
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          value?: Json
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          value?: Json
+          updated_at?: string
         }
         Relationships: []
       }

@@ -3,7 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { getLocalUser, isLocalAuthEnabled, signInLocal } from "@/integrations/supabase/local-auth";
 import { LangSwitch, useI18n } from "@/i18n";
 import { art } from "@/components/sanctuary/art";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,10 @@ function AuthPage() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
+    if (getLocalUser()) {
+      navigate({ to: "/dashboard", replace: true });
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: "/dashboard", replace: true });
     });
@@ -49,9 +53,19 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "in") {
+        if (isLocalAuthEnabled()) {
+          const local = signInLocal(email, password);
+          if ("error" in local) throw new Error(local.error);
+          navigate({ to: "/dashboard", replace: true });
+          return;
+        }
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
+        if (isLocalAuthEnabled()) {
+          toast.error(t.auth.failed);
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -68,11 +82,6 @@ function AuthPage() {
     } finally {
       setBusy(false);
     }
-  }
-
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (result.error) toast.error(t.auth.failed);
   }
 
   return (
@@ -97,15 +106,7 @@ function AuthPage() {
             {mode === "in" ? t.auth.title : t.auth.signUp}
           </h1>
           <p className="mt-2 text-muted-foreground">{t.auth.lead}</p>
-          <Button type="button" variant="outline" className="mt-8 w-full" onClick={google}>
-            {t.auth.google}
-          </Button>
-          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            {t.auth.or}
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="mt-8 space-y-4">
             {mode === "up" && (
               <div className="space-y-2">
                 <Label htmlFor="name">{t.auth.name}</Label>
@@ -132,13 +133,15 @@ function AuthPage() {
               {mode === "in" ? t.auth.signIn : t.auth.signUp}
             </Button>
           </form>
-          <button
-            type="button"
-            className="mt-6 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            onClick={() => setMode(mode === "in" ? "up" : "in")}
-          >
-            {mode === "in" ? t.auth.noAccount : t.auth.haveAccount}
-          </button>
+          {!isLocalAuthEnabled() && (
+            <button
+              type="button"
+              className="mt-6 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              onClick={() => setMode(mode === "in" ? "up" : "in")}
+            >
+              {mode === "in" ? t.auth.noAccount : t.auth.haveAccount}
+            </button>
+          )}
         </div>
       </div>
     </div>
