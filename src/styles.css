@@ -752,6 +752,78 @@ html.fx [data-reveal].is-in {
   background: transparent;
 }
 
+/* Above the split panes, behind Mary — light wraps her, not over her. */
+.hero-laser {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hero-laser-flow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero > .split-pane {
+  z-index: 1;
+}
+
+/* Elliptical surface for laser wrap; figure itself stays a transparent cut-out. */
+.hero-laser-surface {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: -8%;
+  height: 94%;
+  width: min(52vh, 42vw);
+  aspect-ratio: 2 / 3;
+  translate: -50% 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: transparent;
+  overflow: visible;
+}
+
+.hero-laser-surface .hero-figure {
+  position: relative;
+  z-index: 2;
+  left: auto;
+  bottom: auto;
+  height: 100%;
+  width: 100%;
+  translate: none;
+  background: transparent;
+  -webkit-mask-image:
+    radial-gradient(ellipse 78% 86% at 50% 38%, #000 28%, #000 48%, transparent 76%),
+    linear-gradient(180deg, #000 0%, #000 58%, transparent 96%);
+  mask-image:
+    radial-gradient(ellipse 78% 86% at 50% 38%, #000 28%, #000 48%, transparent 76%),
+    linear-gradient(180deg, #000 0%, #000 58%, transparent 96%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.hero-laser-surface .mary-float,
+.hero-laser-surface .mary-img {
+  background: transparent;
+}
+
+.hero-laser-surface .mary-img {
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 16px 28px oklch(0.3 0.06 250 / 0.22));
+}
+
+.hero-laser-surface .nimbus-glow {
+  opacity: 0.55;
+  filter: blur(3px);
+}
+
 .hero-sky {
   position: absolute;
   inset: 0;
@@ -851,6 +923,7 @@ html.fx [data-reveal].is-in {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: transparent;
   filter: drop-shadow(0 30px 40px oklch(0.44 0.11 242 / 0.28));
 }
 
@@ -2745,6 +2818,10 @@ html.fx [data-reveal].is-in {
 
   .hero-figure,
   .hero-figure.is-split {
+    height: 68%;
+  }
+
+  .hero-laser-surface {
     height: 68%;
   }
 

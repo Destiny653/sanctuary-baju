@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import FlexCarousel from "@/components/FlexCarousel";
 import Masonry from "@/components/Masonry";
-import { art } from "@/components/sanctuary/art";
 import { GALLERY_HERO_STATIONS, LOCAL_GALLERY_SEGMENTS } from "@/components/sanctuary/gallery-local";
 import { SplitText } from "@/components/sanctuary/motion";
 import { Shell } from "@/components/sanctuary/shell";
 import { pick, useI18n } from "@/i18n";
+
+const GALLERY_SKY = "/assets/sanc-images/IMG_1125.jpg";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -40,7 +41,7 @@ function GalleryPage() {
       {() => (
         <div className="gallery-page">
           <section className="gallery-hero" data-scroll>
-            <img className="gallery-hero-sky ken" src={art.heaven} alt="" />
+            <img className="gallery-hero-sky ken" src={GALLERY_SKY} alt="" />
             <div className="gallery-hero-sun" aria-hidden="true" />
             <div className="gallery-hero-rays" aria-hidden="true" />
             <div className="gallery-hero-wash" aria-hidden="true" />
