@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef } from "react";
-import { art, evangel } from "./art";
+import { evangel } from "./art";
 import { formatDay, postsQuery } from "./content";
 import { SplitText, Tilt, VelocityMarquee, useHorizontalPin } from "./motion";
 
@@ -82,36 +82,6 @@ export function Marquees() {
     <section className="marquee-band" aria-label="Words of the house">
       <VelocityMarquee items={["Ave Maria", "Gratia plena", "Dominus tecum", "Mater misericordiae"]} />
       <VelocityMarquee reverse items={["By His wounds we are healed", "Go and tell", "Peace be with you"]} />
-    </section>
-  );
-}
-
-export function Mysteries() {
-  const items = [
-    { src: art.rosaryJoyful, title: "Joyful", text: "The Annunciation to the Finding in the Temple" },
-    { src: art.rosaryLuminous, title: "Luminous", text: "The Baptism to the Institution of the Eucharist" },
-    { src: art.rosaryGlorious, title: "Glorious", text: "The Resurrection to the Coronation of Mary" },
-  ];
-  return (
-    <section className="mysteries band">
-      <div className="mysteries-mountain" aria-hidden="true">
-        <img src={art.mountains} alt="" data-parallax="0.2" loading="lazy" />
-      </div>
-      <div className="section-head">
-        <p className="kicker">The Mount of Mary</p>
-        <SplitText text="Mysteries of the rosary" className="display-xl" />
-      </div>
-      <div className="mysteries-row">
-        {items.map((m, i) => (
-          <Tilt key={m.src} className="mystery-card" style={{ ["--i" as string]: i }}>
-            <img src={m.src} alt={`${m.title} mysteries`} loading="lazy" />
-            <div>
-              <h3>{m.title}</h3>
-              <p>{m.text}</p>
-            </div>
-          </Tilt>
-        ))}
-      </div>
     </section>
   );
 }

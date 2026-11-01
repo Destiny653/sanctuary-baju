@@ -59,9 +59,11 @@ export function Interlude() {
   return (
     <section className="interlude" id="mercy" data-scroll="sticky" aria-label="Mercy">
       <div className="interlude-stage">
+        <h2 className="interlude-word" aria-hidden="true">
+          Mercy
+        </h2>
         <img className="fly fly-a" src={art.face} alt="" loading="lazy" />
         <img className="fly fly-b" src={art.hands} alt="" loading="lazy" />
-        <h2 className="interlude-word">Mercy</h2>
         <img className="fly fly-c" src={art.angels} alt="" loading="lazy" />
         <p className="interlude-note">Wider than the water. Open before the first bell.</p>
       </div>
@@ -97,34 +99,6 @@ export function Way() {
           loading="lazy"
         />
       </figure>
-    </section>
-  );
-}
-
-export function Company() {
-  return (
-    <section className="company" id="company" data-scroll>
-      <div className="company-copy">
-        <div className="glass company-card" data-reveal>
-          <p className="kicker">The company</p>
-          <h2 className="display-lg">They keep the wall</h2>
-          <p className="serif-lead">
-            Three carved figures attend the north side of the nave. They are not ornament. They are
-            the posture the house hopes for: attention, without an audience.
-          </p>
-          <a className="pill" href="#descent">
-            Read more
-          </a>
-        </div>
-      </div>
-      <div className="company-frame">
-        <img
-          className="para float"
-          src={art.angels}
-          alt="Three carved African angels with white wings, kneeling and hovering in prayer"
-          loading="lazy"
-        />
-      </div>
     </section>
   );
 }

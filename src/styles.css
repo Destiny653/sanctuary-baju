@@ -1203,28 +1203,36 @@ html.fx [data-reveal].is-in {
   overflow: hidden;
   display: grid;
   place-items: center;
+  isolation: isolate;
 }
 
 .interlude-word {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: grid;
+  place-items: center;
   margin: 0;
+  overflow: hidden;
+  pointer-events: none;
   font-family: var(--display);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.8;
-  font-size: clamp(5rem, 22vw, 22rem);
-  color: var(--snow);
-  text-shadow: 0 20px 80px oklch(0.58 0.14 238 / 0.45);
-  transform: scale(calc(0.55 + var(--p, 0.5) * 1.1));
+  font-size: clamp(4.5rem, 18vw, 16rem);
+  color: color-mix(in srgb, var(--ink) 55%, white);
+  text-shadow: 0 16px 60px color-mix(in srgb, #1f63bf 28%, transparent);
+  transform: scale(calc(0.42 + var(--p, 0.5) * 0.78));
   filter: blur(calc((1 - min(1, var(--p, 0.5) * 2.4)) * 14px));
-  opacity: calc(0.2 + var(--p, 0.5) * 2);
+  opacity: calc(0.15 + var(--p, 0.5) * 1.35);
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .fly {
   position: absolute;
-  z-index: 3;
+  z-index: 2;
   object-fit: cover;
   border-radius: 6px;
   border: 6px solid oklch(1 0 0 / 0.75);
@@ -1250,7 +1258,7 @@ html.fx [data-reveal].is-in {
 }
 
 .fly-c {
-  z-index: 1;
+  z-index: 2;
   left: 50%;
   top: 70%;
   width: clamp(12rem, 26vw, 24rem);
@@ -1266,7 +1274,7 @@ html.fx [data-reveal].is-in {
 
 .interlude-note {
   position: absolute;
-  z-index: 4;
+  z-index: 3;
   bottom: 12%;
   left: 0;
   right: 0;
