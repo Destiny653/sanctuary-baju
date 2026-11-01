@@ -83,23 +83,27 @@ export function ScrollVideo() {
       className={`scroll-film${reduced ? " is-reduced" : ""}`}
       aria-label="Our Lady of Mercy film"
     >
-      {failed ? (
-        <div className="scroll-film-media scroll-film-fallback" aria-label="Our Lady of Mercy film unavailable" />
-      ) : (
-        <video
-          ref={videoRef}
-          className="scroll-film-media"
-          preload="auto"
-          muted
-          playsInline
-          controls={reduced}
-          onError={() => setFailed(true)}
-          aria-label="Mary praying in a sunlit courtyard"
-        >
-          <source src={SCROLL_VIDEO_SRC} type="video/mp4" />
-        </video>
-      )}
-      {!failed && <FilmNarration videoRef={videoRef} {...narration} reduced={reduced} />}
+      <div className="scroll-film-shell">
+        <div className="scroll-film-frame">
+          {failed ? (
+            <div className="scroll-film-media scroll-film-fallback" aria-label="Our Lady of Mercy film unavailable" />
+          ) : (
+            <video
+              ref={videoRef}
+              className="scroll-film-media"
+              preload="auto"
+              muted
+              playsInline
+              controls={reduced}
+              onError={() => setFailed(true)}
+              aria-label="Mary praying in a sunlit courtyard"
+            >
+              <source src={SCROLL_VIDEO_SRC} type="video/mp4" />
+            </video>
+          )}
+          {!failed && <FilmNarration videoRef={videoRef} {...narration} reduced={reduced} />}
+        </div>
+      </div>
       <div className="scroll-film-progress" aria-hidden="true">
         <div ref={progressRef} />
       </div>
