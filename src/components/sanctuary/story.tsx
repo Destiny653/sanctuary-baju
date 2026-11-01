@@ -194,7 +194,7 @@ export function Descent() {
           }
         />
       </div>
-      <div className="descent-copy" data-reveal>
+      <div className="descent-copy glass" data-reveal>
         <p className="kicker">The rosary</p>
         <h2 className="display-lg">A weapon, not a decoration</h2>
         <p className="body-copy">
