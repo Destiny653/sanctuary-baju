@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Our Lady of Mercy">
+  <rect width="32" height="32" rx="6" fill="#07111F"/>
+  <path fill="#F5F8FC" d="M4.5 27.5V14.2C4.5 7.8 9.6 2.8 16 2.8s11.5 5 11.5 11.4v13.3H4.5z"/>
+  <path fill="#07111F" d="M10.2 27.5V16.4c0-3.2 2.6-5.8 5.8-5.8s5.8 2.6 5.8 5.8v11.1H10.2z"/>
+  <rect x="3" y="23.2" width="26" height="4.2" rx="1" fill="#3D7EC8"/>
+</svg>
