@@ -258,46 +258,68 @@ export function useHorizontalPin(section: React.RefObject<HTMLElement | null>, t
     ensureGsap();
     const s = section.current;
     const t = track.current;
-    if (!s || !t || prefersReduced() || window.innerWidth < 760) return;
+    if (!s || !t || prefersReduced()) return;
 
+    const mobile = window.matchMedia("(max-width: 760px)");
     let ctx: gsap.Context | null = null;
+    let softRefresh: number | undefined;
+
+    const kill = () => {
+      ctx?.revert();
+      ctx = null;
+      gsap.set(t, { clearProps: "transform,x" });
+    };
+
+    const distance = () => Math.max(t.scrollWidth - window.innerWidth, 0);
 
     const init = () => {
-      if (ctx) ctx.revert();
+      kill();
+      if (mobile.matches || distance() < 24) return;
+
       ctx = gsap.context(() => {
         gsap.to(t, {
-          x: () => -(t.scrollWidth - window.innerWidth + 48),
+          x: () => -distance(),
           ease: "none",
           scrollTrigger: {
             trigger: s,
             start: "top top",
-            end: () => "+=" + (t.scrollWidth - window.innerWidth),
+            end: () => `+=${distance()}`,
             pin: true,
             scrub: 1,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
+            pinSpacing: true,
           },
         });
       }, s);
       ScrollTrigger.refresh();
     };
 
-    // Wait until images have actually loaded so scrollWidth is correct
     const imgs = Array.from(t.querySelectorAll<HTMLImageElement>("img"));
-    const loaded = imgs.filter((img) => img.complete);
-    if (loaded.length === imgs.length) {
+    let pending = imgs.filter((img) => !img.complete).length;
+    const onReady = () => {
       init();
+      softRefresh = window.setTimeout(() => ScrollTrigger.refresh(), 350);
+    };
+
+    if (pending === 0) {
+      onReady();
     } else {
-      let count = 0;
-      const onLoad = () => { count++; if (count >= imgs.length) init(); };
-      imgs.forEach((img) => { if (!img.complete) img.addEventListener("load", onLoad, { once: true }); });
-      // Also fire after 800 ms as a safety net in case some images fail
-      const fallback = window.setTimeout(init, 800);
-      return () => {
-        window.clearTimeout(fallback);
-        ctx?.revert();
+      const onLoad = () => {
+        pending -= 1;
+        if (pending <= 0) onReady();
       };
+      imgs.forEach((img) => {
+        if (!img.complete) img.addEventListener("load", onLoad, { once: true });
+      });
+      softRefresh = window.setTimeout(onReady, 900);
     }
 
-    return () => ctx?.revert();
+    mobile.addEventListener("change", init);
+    return () => {
+      mobile.removeEventListener("change", init);
+      if (softRefresh) window.clearTimeout(softRefresh);
+      kill();
+    };
   }, [section, track]);
 }

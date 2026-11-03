@@ -9,28 +9,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  deleteStoredPost,
+  listStoredPosts,
+  mergeRemoteIntoStore,
+  newPostId,
+  upsertStoredPost,
+  type StoredPost,
+} from "@/components/sanctuary/local-posts";
 import { useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 type Kind = "news" | "event" | "life";
 
-type PostRow = {
-  id: string;
-  kind: string;
-  slug: string;
-  title_en: string;
-  title_fr: string;
-  excerpt_en: string;
-  excerpt_fr: string;
-  body_en: string;
-  body_fr: string;
-  cover_url: string | null;
-  video_url: string | null;
-  published: boolean;
-  published_at: string;
-  event_start: string | null;
-  event_location: string | null;
-};
+type PostRow = StoredPost;
 
 const empty = (kind: Kind): Omit<PostRow, "id"> => ({
   kind,
@@ -68,31 +60,42 @@ export function PostsManager({ kind, title, lead }: { kind: Kind; title: string;
   const { data = [], isLoading } = useQuery({
     queryKey: ["dash", "posts", kind],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("kind", kind)
-        .order(kind === "event" ? "event_start" : "published_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as PostRow[];
+      try {
+        const { data: remote, error } = await supabase
+          .from("posts")
+          .select("*")
+          .eq("kind", kind)
+          .order(kind === "event" ? "event_start" : "published_at", { ascending: false });
+        if (!error && remote?.length) {
+          mergeRemoteIntoStore(remote as StoredPost[]);
+        }
+      } catch {
+        /* local store remains the source of truth */
+      }
+      return listStoredPosts(kind) as PostRow[];
     },
   });
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload = {
+      const id = editing?.id ?? newPostId();
+      const payload: StoredPost = {
         ...draft,
+        id,
         kind,
         slug: draft.slug || slugify(draft.title_en || draft.title_fr || "post"),
         event_location: kind === "event" ? draft.event_location : null,
         event_start: kind === "event" ? draft.event_start : null,
       };
-      if (editing) {
-        const { error } = await supabase.from("posts").update(payload).eq("id", editing.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("posts").insert(payload);
-        if (error) throw error;
+      upsertStoredPost(payload);
+      try {
+        if (editing) {
+          await supabase.from("posts").update(payload).eq("id", editing.id);
+        } else {
+          await supabase.from("posts").insert(payload);
+        }
+      } catch {
+        /* local save already succeeded */
       }
     },
     onSuccess: async () => {
@@ -108,8 +111,12 @@ export function PostsManager({ kind, title, lead }: { kind: Kind; title: string;
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("posts").delete().eq("id", id);
-      if (error) throw error;
+      deleteStoredPost(id);
+      try {
+        await supabase.from("posts").delete().eq("id", id);
+      } catch {
+        /* local delete already succeeded */
+      }
     },
     onSuccess: async () => {
       toast.success(t.dash.deleted);

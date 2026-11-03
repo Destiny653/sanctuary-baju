@@ -1,8 +1,15 @@
 import { Hero } from "./hero";
 import { ScrollVideo } from "./scroll-video";
-import { Evangel, Happenings, Marquees, PassionScroll } from "./home-sections";
+import {
+  Evangel,
+  FinalInvite,
+  Happenings,
+  Marquees,
+  PassionScroll,
+  Welcome,
+} from "./home-sections";
 import { Shell } from "./shell";
-import { Descent, Interlude, Way } from "./story";
+import { Descent, Interlude } from "./story";
 
 export function HomePage() {
   return (
@@ -10,14 +17,15 @@ export function HomePage() {
       {() => (
         <>
           <Hero />
+          <Descent />
+          <Welcome />
           <ScrollVideo />
           <PassionScroll />
           <Marquees />
           <Evangel />
           <Interlude />
-          <Way />
-          <Descent />
           <Happenings />
+          <FinalInvite />
         </>
       )}
     </Shell>

@@ -81,6 +81,9 @@ export function Way() {
         <p className="kicker">{t.home.wayKicker}</p>
         <h2 className="display-lg">{t.home.wayTitle}</h2>
         <p className="serif-lead">{t.home.wayLead}</p>
+        <a className="pill" href="#passion">
+          {t.home.wayCta}
+        </a>
       </div>
       <img
         className="way-figure para"
@@ -130,19 +133,18 @@ function DescentCopy() {
   const { t } = useI18n();
   return (
     <div className="descent-copy glass" data-reveal>
-      <p className="kicker">{t.home.weaponKicker}</p>
-      <h2 className="display-lg">{t.home.weaponTitle}</h2>
+      <p className="kicker">{t.home.descentKicker}</p>
+      <h2 className="display-lg">{t.home.descentTitle}</h2>
+      <p className="serif-lead">{t.home.descentLead}</p>
+      <p className="body-copy">{t.home.weaponBody}</p>
       <p className="body-copy">
         <em>{t.home.weaponQuote1}</em>
         <br />
         <span className="cite">{t.home.weaponCite1}</span>
       </p>
-      <p className="body-copy">{t.home.weaponBody}</p>
-      <p className="body-copy">
-        <em>{t.home.weaponQuote2}</em>
-        <br />
-        <span className="cite">{t.home.weaponCite2}</span>
-      </p>
+      <a className="pill" href="#passion">
+        {t.home.descentCta}
+      </a>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { hasLocalPostsStore, listPublishedPosts, mergeRemoteIntoStore, type StoredPost } from "./local-posts";
 
 export type Post = {
   id: string;
@@ -42,22 +43,56 @@ async function softFetch<T>(run: () => PromiseLike<T>, fallback: T, ms = 2500): 
   }
 }
 
+function toPublicPost(row: StoredPost): Post {
+  return {
+    id: row.id,
+    kind: row.kind,
+    slug: row.slug,
+    title_en: row.title_en,
+    title_fr: row.title_fr,
+    excerpt_en: row.excerpt_en,
+    excerpt_fr: row.excerpt_fr,
+    body_en: row.body_en,
+    body_fr: row.body_fr,
+    cover_url: row.cover_url,
+    video_url: row.video_url,
+    published_at: row.published_at,
+    event_start: row.event_start,
+    event_location: row.event_location,
+  };
+}
+
 export const postsQuery = (kind: "news" | "event" | "life" | "all") =>
   queryOptions({
     queryKey: ["posts", kind],
-    queryFn: async (): Promise<Post[]> =>
-      softFetch(async () => {
-        let q = supabase.from("posts").select(POST_COLS).eq("published", true);
+    queryFn: async (): Promise<Post[]> => {
+      // Once the dashboard has touched the on-device store, it is the source of truth
+      // (including empty / deleted). Import from cloud only on first visit.
+      if (hasLocalPostsStore()) {
+        return listPublishedPosts(kind).map(toPublicPost);
+      }
+
+      const remote = await softFetch(async () => {
+        let q = supabase.from("posts").select(`${POST_COLS},published`).eq("published", true);
         if (kind !== "all") q = q.eq("kind", kind);
         const { data, error } = await q.order(kind === "event" ? "event_start" : "published_at", {
           ascending: kind === "event",
         });
         if (error) {
           console.warn("posts unavailable", error.message);
-          return [];
+          return [] as StoredPost[];
         }
-        return data ?? [];
-      }, []),
+        const rows = (data ?? []).map((row) => {
+          const r = row as unknown as StoredPost;
+          return { ...r, published: r.published ?? true };
+        });
+        mergeRemoteIntoStore(rows);
+        return rows;
+      }, [] as StoredPost[]);
+
+      if (remote.length) return listPublishedPosts(kind).map(toPublicPost);
+      return [];
+    },
     networkMode: "offlineFirst",
     retry: false,
   });
