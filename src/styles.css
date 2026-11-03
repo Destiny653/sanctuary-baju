@@ -136,6 +136,10 @@
     scroll-behavior: smooth;
   }
 
+  html {
+    overflow-x: clip;
+  }
+
   body {
     margin: 0;
     background: transparent;
@@ -143,7 +147,13 @@
     font-family: var(--serif);
     font-size: 1.125rem;
     line-height: 1.5;
-    overflow-x: hidden;
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  #root {
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   ::selection {
@@ -167,6 +177,8 @@
   position: fixed;
   inset: 0;
   z-index: -1;
+  width: 100%;
+  max-width: 100vw;
   overflow: hidden;
   pointer-events: none;
   background:
@@ -619,12 +631,14 @@ html.fx [data-reveal].is-in {
   position: fixed;
   z-index: 40;
   top: 0.75rem;
-  left: 1.5vw;
-  right: 1.5vw;
+  left: max(0.6rem, 1.5vw);
+  right: max(0.6rem, 1.5vw);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  max-width: calc(100vw - 1.2rem);
+  box-sizing: border-box;
   padding: 0.55rem 0.7rem 0.55rem 1.2rem;
   color: var(--ink);
   background:
@@ -645,8 +659,8 @@ html.fx [data-reveal].is-in {
 
 .site-nav.is-scrolled {
   top: 0.5rem;
-  left: 4vw;
-  right: 4vw;
+  left: max(0.6rem, 2vw);
+  right: max(0.6rem, 2vw);
   background:
     linear-gradient(145deg, color-mix(in srgb, white 36%, transparent), var(--glass)),
     var(--glass-tint);
@@ -1711,22 +1725,162 @@ html.fx [data-reveal].is-in {
 }
 
 @media (max-width: 700px) {
+  .hero {
+    height: 100svh;
+    min-height: 100svh;
+  }
+
   .hero-copy {
     top: auto;
-    bottom: 5.5rem;
-    max-width: min(34rem, 88vw);
+    bottom: max(4.5rem, 8svh);
+    left: 1.15rem;
+    right: 1.15rem;
+    max-width: none;
+    gap: 0.65rem;
   }
 
   .hero-headline {
-    font-size: clamp(1.55rem, 7vw, 2.1rem);
+    font-size: clamp(1.5rem, 6.8vw, 2rem);
   }
 
   .hero-lede {
-    font-size: 1rem;
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+
+  .hero-ctas {
+    gap: 0.55rem;
   }
 
   .hero-laser-surface {
     opacity: 0.92;
+  }
+
+  .display-xl {
+    font-size: clamp(1.75rem, 8.8vw, 2.55rem);
+  }
+
+  .display-lg {
+    font-size: clamp(1.55rem, 7.5vw, 2.25rem);
+  }
+
+  .serif-lead {
+    font-size: clamp(1.08rem, 4.2vw, 1.3rem);
+    max-width: 100%;
+  }
+
+  .section-head {
+    max-width: 100%;
+    margin-bottom: 1.75rem;
+  }
+
+  .welcome-grid {
+    gap: 1.75rem;
+  }
+
+  .welcome-figure img {
+    height: min(20rem, 46vh);
+  }
+
+  .final-invite-panel {
+    padding: 1.5rem 1.15rem;
+    max-width: 100%;
+  }
+
+  .evangel-word {
+    right: auto;
+    left: 0;
+    top: 0.35rem;
+    width: 100%;
+    text-align: right;
+    padding-right: 0.5rem;
+    box-sizing: border-box;
+    font-size: clamp(2.6rem, 18vw, 4.2rem);
+    -webkit-text-stroke-width: 1.5px;
+  }
+
+  .evangel-card h3 {
+    font-size: 1.35rem;
+  }
+
+  .evangel-card p {
+    font-size: 1.05rem;
+  }
+
+  .site-nav {
+    left: 0.6rem;
+    right: 0.6rem;
+    gap: 0.35rem;
+    padding: 0.4rem 0.4rem 0.4rem 0.75rem;
+  }
+
+  .site-nav.is-scrolled {
+    left: 0.6rem;
+    right: 0.6rem;
+  }
+
+  .brand {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+  }
+
+  .nav-tools {
+    gap: 0.2rem;
+  }
+
+  .icon-btn,
+  .search-pill {
+    min-height: 2.45rem;
+    width: 2.45rem;
+  }
+
+  .marquee-band {
+    margin: 1.25rem 0;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-laser {
+    opacity: 0.55;
+  }
+
+  .hero-cinematic-wash {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--ink) 55%, transparent), transparent 38%),
+      linear-gradient(90deg, color-mix(in srgb, var(--ink) 72%, transparent) 0%, color-mix(in srgb, var(--ink) 35%, transparent) 42%, transparent 68%),
+      linear-gradient(to top, color-mix(in srgb, var(--ink) 58%, transparent), transparent 42%);
+  }
+
+  .happen-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .happen-card p {
+    font-size: 1rem;
+  }
+
+  .happen-events {
+    padding: 1.35rem 1.15rem;
+  }
+
+  .happen-events li strong {
+    font-size: 1.05rem;
+  }
+
+  .date-chip {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .interlude-note {
+    padding-inline: 1.15rem;
+    font-size: clamp(1.05rem, 4vw, 1.35rem);
+  }
+
+  .fly-a,
+  .fly-b {
+    width: clamp(6.5rem, 28vw, 10rem);
   }
 }
 
@@ -3036,14 +3190,9 @@ html.fx [data-reveal].is-in {
     display: none;
   }
 
-  .way-copy,
-  .descent-copy {
-    margin: 6.5rem 1.25rem 2rem;
-    padding: 1.6rem;
-  }
-
   .way-copy {
-    margin-bottom: 60vh;
+    margin: 6.5rem 1.25rem 60vh;
+    padding: 1.6rem;
   }
 
   .company-copy {
@@ -3065,12 +3214,30 @@ html.fx [data-reveal].is-in {
     min-height: 22rem;
   }
 
+  .descent {
+    height: 100svh;
+    min-height: 100svh;
+    max-height: 100svh;
+  }
+
   .descent-copy {
-    margin-bottom: 70vh;
+    top: auto;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    left: 1.25rem;
+    margin: 0;
+    max-width: none;
+    translate: none;
+    max-height: min(48%, 20rem);
+    padding: 1.25rem 1.35rem 1.4rem;
   }
 
   .descent-figure-center {
-    width: clamp(10rem, 40vw, 16rem);
+    width: clamp(9rem, 38vw, 14rem);
+  }
+
+  .descent-spiral .infinite-spiral {
+    min-height: 100%;
   }
 
   .fly-a {
@@ -3348,7 +3515,7 @@ section {
   z-index: 1;
   isolation: isolate;
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
   min-height: 100svh;
   overflow: hidden;
   background: var(--snow) !important;
@@ -3358,16 +3525,43 @@ section {
   background: var(--snow) !important;
 }
 
+.passion-pin-fill,
+.passion-pin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--snow);
+  pointer-events: none;
+}
+
+/*
+ * GSAP pin-spacers are hollow by default. On mobile the pinned panel can desync
+ * and the page sky (blue) shows through — paint every spacer snow so that never happens.
+ */
+.pin-spacer,
+.pin-spacer:has(> .passion-pin),
+.pin-spacer:has(> #passion),
+.pin-spacer:has(> .scroll-film),
+.passion-pin-spacer {
+  background: var(--snow) !important;
+  background-color: var(--snow) !important;
+}
+
 .passion-track {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 2rem;
   align-items: center;
   min-height: 100svh;
+  height: 100svh;
   padding: 6rem 2rem;
   width: max-content;
   max-width: none;
   will-change: transform;
   background: var(--snow);
+  box-sizing: border-box;
 }
 
 .passion-intro {
@@ -3443,39 +3637,114 @@ section {
 }
 
 @media (max-width: 760px) {
-  .passion-pin {
-    min-height: 0;
-    overflow: visible;
+  /*
+   * Kill GSAP pin geometry on phones (spacer height / fixed transforms are set inline).
+   * Without this, a hollow pin-spacer scrolls for thousands of px and the blue sky shows.
+   * Stations stay in a horizontal swipe row.
+   */
+  .pin-spacer:has(> #passion),
+  .pin-spacer:has(> .passion-pin),
+  .passion-pin-spacer {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: var(--snow) !important;
+    background-color: var(--snow) !important;
   }
 
-  .passion-track {
-    width: 100%;
-    max-width: 100%;
-    min-height: 0;
-    flex-direction: column;
-    padding: 4rem 1.25rem 5rem;
+  .pin-spacer:has(> #passion) > .passion-pin,
+  .pin-spacer:has(> .passion-pin) > .passion-pin,
+  .passion-pin,
+  .passion-pin--native {
+    position: relative !important;
+    inset: auto !important;
+    translate: none !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: var(--snow) !important;
+  }
+
+  .passion-pin .passion-track,
+  .passion-pin--native .passion-track,
+  .pin-spacer:has(> #passion) .passion-track {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 4.5rem 1.15rem 3.5rem;
+    background: var(--snow) !important;
+    transform: none !important;
+    translate: none !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 
   .passion-intro {
-    width: 100%;
+    width: min(16.5rem, 78vw);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 0.5rem;
+  }
+
+  .passion-intro .display-xl {
+    font-size: clamp(1.7rem, 8.5vw, 2.35rem);
+  }
+
+  .passion-intro .serif-lead {
+    font-size: 1.05rem;
   }
 
   .passion-card {
-    width: 100%;
+    width: clamp(12.75rem, 72vw, 17.5rem);
+    scroll-snap-align: center;
   }
 
   .passion-card:nth-child(even) {
     margin-top: 0;
   }
 
+  .passion-card-cap {
+    padding: 2.6rem 0.85rem 0.9rem;
+  }
+
+  .passion-card-cap span {
+    font-size: 1.7rem;
+  }
+
+  .passion-card-cap h3 {
+    font-size: 0.88rem;
+  }
+
   .descent-copy {
     top: auto;
-    bottom: 1.25rem;
-    right: 1.25rem;
-    left: 1.25rem;
+    bottom: 1.1rem;
+    right: 1rem;
+    left: 1rem;
+    margin: 0;
     max-width: none;
     translate: none;
-    max-height: 42%;
+    max-height: min(46%, 18rem);
+    padding: 1.15rem 1.2rem 1.25rem;
+  }
+
+  .descent-copy .display-lg {
+    font-size: clamp(1.45rem, 6.5vw, 2rem);
   }
 }
 
@@ -3489,9 +3758,19 @@ section {
   padding: 2.5rem 0;
   background: var(--ink);
   color: var(--snow);
-  transform: rotate(-2deg);
-  margin: 2rem -2rem;
+  transform: none;
+  margin: 1.5rem 0;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (min-width: 761px) {
+  .marquee-band {
+    transform: rotate(-2deg);
+    margin: 2rem 0;
+  }
 }
 
 .marquee {

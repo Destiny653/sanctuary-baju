@@ -1,13 +1,7 @@
 import { Hero } from "./hero";
 import { ScrollVideo } from "./scroll-video";
-import {
-  Evangel,
-  FinalInvite,
-  Happenings,
-  Marquees,
-  PassionScroll,
-  Welcome,
-} from "./home-sections";
+import { Evangel, FinalInvite, Happenings, Marquees, Welcome } from "./landing-sections";
+import { PassionScroll } from "./passion-scroll";
 import { Shell } from "./shell";
 import { Descent, Interlude } from "./story";
 

@@ -90,9 +90,13 @@ export function useSmoothScroll() {
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
+    (window as Window & { __lenis?: Lenis }).__lenis = lenis;
     window.scrollTo(0, 0);
     return () => {
       gsap.ticker.remove(tick);
+      if ((window as Window & { __lenis?: Lenis }).__lenis === lenis) {
+        delete (window as Window & { __lenis?: Lenis }).__lenis;
+      }
       lenis.destroy();
     };
   }, []);
@@ -104,21 +108,24 @@ export function useGsapReveals() {
     ensureGsap();
     if (prefersReduced()) return;
     const ctx = gsap.context(() => {
+      const narrow = window.matchMedia("(max-width: 760px)").matches;
+      const slide = narrow ? 24 : 80;
+      const lift = narrow ? 36 : 70;
       gsap.utils.toArray<HTMLElement>("[data-gsap]").forEach((el) => {
         const kind = el.dataset["gsap"];
         const from: gsap.TweenVars =
           kind === "left"
-            ? { x: -80, opacity: 0, rotate: -2 }
+            ? { x: -slide, opacity: 0, rotate: narrow ? 0 : -2 }
             : kind === "right"
-              ? { x: 80, opacity: 0, rotate: 2 }
+              ? { x: slide, opacity: 0, rotate: narrow ? 0 : 2 }
               : kind === "zoom"
-                ? { scale: 0.85, opacity: 0, filter: "blur(12px)" }
-                : { y: 70, opacity: 0, filter: "blur(8px)" };
+                ? { scale: narrow ? 0.92 : 0.85, opacity: 0, filter: narrow ? "none" : "blur(12px)" }
+                : { y: lift, opacity: 0, filter: narrow ? "none" : "blur(8px)" };
         gsap.from(el, {
           ...from,
-          duration: 1.1,
+          duration: narrow ? 0.85 : 1.1,
           ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
+          scrollTrigger: { trigger: el, start: "top 90%" },
         });
       });
       gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
@@ -252,74 +259,4 @@ export function Tilt({ children, className, style }: { children: ReactNode; clas
   );
 }
 
-/** Pinned horizontal scroll section: children slide sideways while the section is pinned. */
-export function useHorizontalPin(section: React.RefObject<HTMLElement | null>, track: React.RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    ensureGsap();
-    const s = section.current;
-    const t = track.current;
-    if (!s || !t || prefersReduced()) return;
-
-    const mobile = window.matchMedia("(max-width: 760px)");
-    let ctx: gsap.Context | null = null;
-    let softRefresh: number | undefined;
-
-    const kill = () => {
-      ctx?.revert();
-      ctx = null;
-      gsap.set(t, { clearProps: "transform,x" });
-    };
-
-    const distance = () => Math.max(t.scrollWidth - window.innerWidth, 0);
-
-    const init = () => {
-      kill();
-      if (mobile.matches || distance() < 24) return;
-
-      ctx = gsap.context(() => {
-        gsap.to(t, {
-          x: () => -distance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: s,
-            start: "top top",
-            end: () => `+=${distance()}`,
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            pinSpacing: true,
-          },
-        });
-      }, s);
-      ScrollTrigger.refresh();
-    };
-
-    const imgs = Array.from(t.querySelectorAll<HTMLImageElement>("img"));
-    let pending = imgs.filter((img) => !img.complete).length;
-    const onReady = () => {
-      init();
-      softRefresh = window.setTimeout(() => ScrollTrigger.refresh(), 350);
-    };
-
-    if (pending === 0) {
-      onReady();
-    } else {
-      const onLoad = () => {
-        pending -= 1;
-        if (pending <= 0) onReady();
-      };
-      imgs.forEach((img) => {
-        if (!img.complete) img.addEventListener("load", onLoad, { once: true });
-      });
-      softRefresh = window.setTimeout(onReady, 900);
-    }
-
-    mobile.addEventListener("change", init);
-    return () => {
-      mobile.removeEventListener("change", init);
-      if (softRefresh) window.clearTimeout(softRefresh);
-      kill();
-    };
-  }, [section, track]);
-}
+export { useHorizontalPin } from "./use-horizontal-pin";
