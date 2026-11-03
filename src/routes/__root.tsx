@@ -14,7 +14,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportRuntimeError } from "../lib/error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -42,7 +42,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportRuntimeError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      // Fonts are local / system stacks in styles.css — no Google Fonts (works offline).
+      // Fonts: Rumela Smart webfonts from /fonts/rumela-smart — no Google Fonts (works offline).
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],

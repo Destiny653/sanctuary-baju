@@ -1,5 +1,5 @@
 /**
- * Local/dev auth — used on localhost so the dashboard works without Lovable Cloud.
+ * Local/dev auth — used on localhost so the dashboard works without cloud auth.
  * Credentials: sanctuary@gmail.com / sanctuary123
  */
 import type { User } from "@supabase/supabase-js";

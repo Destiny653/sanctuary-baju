@@ -1,24 +1,17 @@
-# Project Migration Studio
+# Sanctuary of Our Lady of Mercy
 
-/skill:migrate-external-project Source: code archive. Migrate the attached project into Lovable.
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8f04bd70-6d4b-4d88-a9bd-973f10d47bb2).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Website for the Sanctuary of Our Lady of Mercy — bilingual (EN/FR), with a scroll-driven film, gallery, news, events, and a staff dashboard.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requires Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
-cd <repository-name>
+cd sanctuary
 npm i
+cp .env.example .env.local   # fill in Supabase (or other) values
 npm run dev
 ```
+
+Local dashboard auth on localhost uses the credentials noted in `.env.example`.

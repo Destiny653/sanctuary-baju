@@ -1,7 +1,4 @@
-/**
- * Site artwork — all paths are local under /public so the site works offline.
- * Lovable Cloud asset pointers are intentionally not used here.
- */
+/** Site artwork — all paths are local under /public so the site works offline. */
 const M = "/assets/mysteries";
 const S = "/assets/stations-cross";
 const I = "/assets/imgs";

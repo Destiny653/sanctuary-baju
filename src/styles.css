@@ -8,16 +8,79 @@
  * Design system: Sanctuary of Our Lady of Mercy.
  * Conversly blues across the house. Text is deep navy (#083A75), never black.
  * Gold is used for one thing only: the ring turning around the Virgin's head.
- * Display / text: local system stacks (offline-safe; no Google Fonts).
+ * Type: Rumela Smart (Productype) — local webfonts in /fonts/rumela-smart (offline-safe).
  * Glass panels (header, cards, hero veil, film frame) stay frosted so the sky shows through.
  * Sanctuary tokens (--ink, --snow, --sky ...) drive the site CSS below;
  * shadcn tokens (--background, --primary, ...) are mapped onto the same palette.
  */
 
+/* Rumela Smart — drop licensed .woff2/.woff files into /public/fonts/rumela-smart/ */
+@font-face {
+  font-family: "Rumela Smart";
+  src:
+    local("Rumela Smart"),
+    local("RumelaSmart-Regular"),
+    url("/fonts/rumela-smart/RumelaSmart-Regular.woff2") format("woff2"),
+    url("/fonts/rumela-smart/RumelaSmart-Regular.woff") format("woff"),
+    url("/fonts/rumela-smart/Rumela Smart Trial.woff2") format("woff2"),
+    url("/fonts/rumela-smart/Rumela Smart Trial.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rumela Smart";
+  src:
+    local("Rumela Smart Medium"),
+    local("RumelaSmart-Medium"),
+    url("/fonts/rumela-smart/RumelaSmart-Medium.woff2") format("woff2"),
+    url("/fonts/rumela-smart/RumelaSmart-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rumela Smart";
+  src:
+    local("Rumela Smart SemiBold"),
+    local("RumelaSmart-SemiBold"),
+    url("/fonts/rumela-smart/RumelaSmart-SemiBold.woff2") format("woff2"),
+    url("/fonts/rumela-smart/RumelaSmart-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rumela Smart";
+  src:
+    local("Rumela Smart Bold"),
+    local("RumelaSmart-Bold"),
+    url("/fonts/rumela-smart/RumelaSmart-Bold.woff2") format("woff2"),
+    url("/fonts/rumela-smart/RumelaSmart-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rumela Smart";
+  src:
+    local("Rumela Smart ExtraBold"),
+    local("RumelaSmart-ExtraBold"),
+    url("/fonts/rumela-smart/RumelaSmart-ExtraBold.woff2") format("woff2"),
+    url("/fonts/rumela-smart/RumelaSmart-ExtraBold.woff") format("woff");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --font-display: var(--display);
   --font-serif: var(--serif);
-  --font-sans: var(--serif);
+  --font-sans: var(--sans);
 
   --color-ink: var(--ink);
   --color-navy: var(--navy);
@@ -58,8 +121,9 @@
 }
 
 :root {
-  --display: "Arial Narrow", "Helvetica Neue Condensed", Impact, "Franklin Gothic Medium", sans-serif;
-  --serif: Georgia, "Times New Roman", "Palatino Linotype", Palatino, serif;
+  --sans: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --display: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --serif: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Conversly blues — deep → light */
   --ink: #083a75;
@@ -144,9 +208,10 @@
     margin: 0;
     background: transparent;
     color: var(--ink);
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: 1.125rem;
     line-height: 1.5;
+    letter-spacing: 0.01em;
     overflow-x: clip;
     max-width: 100%;
   }
