@@ -13,8 +13,10 @@ const LOCAL_USER_ID = "00000000-0000-4000-8000-000000000001";
 
 export function isLocalAuthEnabled() {
   if (typeof window === "undefined") return false;
-  if (import.meta.env["VITE_LOCAL_AUTH"] === "true") return true;
-  if (import.meta.env["VITE_LOCAL_AUTH"] === "false") return false;
+  const flag =
+    process.env["NEXT_PUBLIC_LOCAL_AUTH"] ?? process.env["VITE_LOCAL_AUTH"];
+  if (flag === "true") return true;
+  if (flag === "false") return false;
   const host = window.location.hostname;
   return host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0";
 }

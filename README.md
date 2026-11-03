@@ -1,17 +1,29 @@
-# Sanctuary of Our Lady of Mercy
+# Our Lady of Mercy
 
-Website for the Sanctuary of Our Lady of Mercy — bilingual (EN/FR), with a scroll-driven film, gallery, news, events, and a staff dashboard.
+Next.js App Router site for the sanctuary.
 
-## Development
+## Develop
 
-Requires Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd sanctuary
-npm i
-cp .env.example .env.local   # fill in Supabase (or other) values
+```bash
+npm install
 npm run dev
 ```
 
-Local dashboard auth on localhost uses the credentials noted in `.env.example`.
+Open [http://localhost:3000](http://localhost:3000).
+
+## Build
+
+```bash
+npm run build
+npm start
+```
+
+## Env
+
+Copy `.env.example` to `.env` / `.env.local` and set `NEXT_PUBLIC_SUPABASE_*` (legacy `VITE_*` names still work as fallback).
+
+## Structure
+
+- `src/app` — routes (App Router)
+- `src/components` — UI and sanctuary sections
+- `public/assets` — local images/video (`gallery`, `posts/*`, `leaders`, …)

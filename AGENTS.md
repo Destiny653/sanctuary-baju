@@ -1,9 +1,11 @@
 ## Project rules
+- This is a **Next.js App Router** app (`src/app`). Run with `npm run dev` / `npm run build` / `npm start`. Deploy target is Vercel (`vercel.json`).
 - The homepage uploaded film uses a dedicated ScrollVideo section after Hero, with asset pointers and GSAP ScrollTrigger seeking rather than autoplay; short-keyframe media keeps bidirectional scrubbing responsive and reduced-motion visitors receive native playback controls.
-- Pages are separate routes (`/`, `/gallery`, `/news`, `/events`, `/locations`, `/contact`), each wrapped in `Shell` from `src/components/sanctuary/shell.tsx`, which owns nav, footer, dialogs, Lenis smooth scroll and GSAP reveals — so motion stays consistent per page.
+- Public pages live under `src/app/{route}/page.tsx` (`/`, `/gallery`, `/news`, `/events`, `/locations`, `/contact`, `/about`, `/leadership`, `/auth`). Dashboard routes live under `src/app/dashboard/**`. Shared UI wraps public pages in `Shell` from `src/components/sanctuary/shell.tsx`, which owns nav, footer, dialogs, Lenis smooth scroll and GSAP reveals.
 - Motion uses GSAP + ScrollTrigger driven by Lenis via the GSAP ticker; ReactBits-style pieces (SplitText, VelocityMarquee, Tilt) live in `motion.tsx` rather than an installed package.
 - Film narration uses a reversible GSAP word-reveal timeline in motion.tsx driven by decoded video time, with bilingual chapters in film-narration.ts; this keeps text aligned during seeking and native reduced-motion playback.
-- News, events and gallery are read from cloud tables via query options in `content.ts`, preloaded in route loaders (with an on-device `olm-posts` store for dashboard-managed content).
-- Artwork is served from local `/public` assets, re-exported from `src/components/sanctuary/art.ts`; reference images through `art.*`, never hardcoded `/art/...` paths.
+- News, events and gallery are read from cloud tables via query options in `content.ts` (client-side with TanStack Query). Gallery public page also uses local assets from `public/assets/gallery` via `gallery-local.ts`.
+- Artwork is served from local `/public` assets, re-exported from `src/components/sanctuary/art.ts`; reference images through `art.*`, never hardcoded `/art/...` paths. Dashboard uploads write into `public/assets/{posts/news|posts/event|posts/life|gallery|leaders}/` via `POST /api/upload`.
 - Site styling lives as plain CSS classes in `src/styles.css`, driven by oklch tokens in `:root` (`--ink`, `--snow`, `--blue`…); shadcn tokens map onto that palette. Plain CSS must use `var(--token)`, not `var(--color-*)`, because `@theme inline` does not emit those variables.
 - The notebook (intentions + visit notes) is stored on-device in localStorage key `olm-notebook`; the page copy promises nothing is sent anywhere, so do not move it server-side without changing that copy.
+- Env: prefer `NEXT_PUBLIC_SUPABASE_*` (Vite `VITE_*` names still work as fallback).

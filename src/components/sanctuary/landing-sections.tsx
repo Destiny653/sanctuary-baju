@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { art, evangel } from "./art";
 import { formatDay, postsQuery } from "./content";
@@ -70,7 +70,7 @@ export function FinalInvite() {
         <p className="kicker">{t.home.inviteKicker}</p>
         <h2 className="display-lg">{t.home.inviteTitle}</h2>
         <p className="serif-lead">{t.home.inviteLead}</p>
-        <Link to="/contact" className="pill">
+        <Link href="/contact" className="pill">
           {t.home.inviteCta}
         </Link>
       </div>
@@ -97,7 +97,7 @@ export function Happenings() {
             <p className="empty-note">{t.home.happenNewsEmpty}</p>
           ) : (
             latestNews.map((n) => (
-              <Link key={n.id} to="/news" className="happen-card" data-gsap="left">
+              <Link key={n.id} href="/news" className="happen-card" data-gsap="left">
                 {n.cover_url && <img src={n.cover_url} alt="" loading="lazy" />}
                 <div>
                   <span className="tag">
@@ -120,7 +120,7 @@ export function Happenings() {
                 const d = new Date(e.event_start!);
                 return (
                   <li key={e.id}>
-                    <Link to="/events" className="happen-event-link">
+                    <Link href="/events" className="happen-event-link">
                       <span className="date-chip">
                         <b>{d.getUTCDate()}</b>
                         {d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", {
@@ -139,10 +139,10 @@ export function Happenings() {
             </ul>
           )}
           <div className="happen-actions">
-            <Link to="/events" className="pill">
+            <Link href="/events" className="pill">
               {t.home.fullCalendar}
             </Link>
-            <Link to="/gallery" className="pill pill-ink">
+            <Link href="/gallery" className="pill pill-ink">
               {t.home.seeGallery}
             </Link>
           </div>

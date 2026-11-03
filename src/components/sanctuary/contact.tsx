@@ -1,6 +1,6 @@
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useState, type CSSProperties, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { useI18n } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { art } from "./art";
@@ -91,7 +91,7 @@ export function ContactCompose() {
                 </div>
               </li>
             </ul>
-            <Link className="contact-map-link" to="/locations">
+            <Link className="contact-map-link" href="/locations">
               {t.contact.directions}
             </Link>
           </div>

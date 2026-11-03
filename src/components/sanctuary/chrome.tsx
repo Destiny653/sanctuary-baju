@@ -1,7 +1,8 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Menu, Search, UserRound, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { LangSwitch, useI18n } from "@/i18n";
 import { corpus, places } from "./data";
 import type { Notebook } from "./use-notebook";
@@ -53,6 +54,7 @@ export function Nav({
 }) {
   const { t } = useI18n();
   const links = useNavLinks();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
 
@@ -65,16 +67,19 @@ export function Nav({
 
   return (
     <header className={"site-nav" + (scrolled ? " is-scrolled" : "")}>
-      <Link className="brand" to="/">
+      <Link className="brand" href="/">
         <Mark className="mark" />
         <span>Mercy</span>
       </Link>
       <nav className="desk-nav" aria-label="Primary">
-        {links.map((link) => (
-          <Link key={link.href} to={link.href} activeOptions={{ exact: true }} activeProps={{ className: "is-current" }}>
-            {link.label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const current = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+          return (
+            <Link key={link.href} href={link.href} className={current ? "is-current" : undefined}>
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="nav-tools">
         <LangSwitch />
@@ -103,17 +108,19 @@ export function Nav({
               <X strokeWidth={1.6} />
             </Dialog.Close>
             <nav className="menu-links" aria-label="Mobile">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  activeOptions={{ exact: true }}
-                  activeProps={{ className: "is-current" }}
-                  onClick={() => setMenu(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {links.map((link) => {
+                const current = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={current ? "is-current" : undefined}
+                    onClick={() => setMenu(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
             <div className="mt-8">
               <LangSwitch />
@@ -136,7 +143,7 @@ export function SearchDialog({
 }) {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
   const ROUTE_OF: Record<
     string,
     "/" | "/locations" | "/contact" | "/gallery" | "/news" | "/events" | "/about" | "/leadership"
@@ -205,7 +212,8 @@ export function SearchDialog({
                     onOpenChange(false);
                     setQuery("");
                     const to = ROUTE_OF[item.id] ?? "/";
-                    void navigate({ to }).then(() => window.setTimeout(() => scrollToId(item.id), 120));
+                    router.push(to);
+                    window.setTimeout(() => scrollToId(item.id), 120);
                   }}
                 >
                   <strong>{item.title}</strong>
@@ -294,7 +302,7 @@ export function Footer() {
     <footer className="footer">
       <div className="footer-top">
         <div className="footer-brand">
-          <Link className="footer-brand-link" to="/">
+          <Link className="footer-brand-link" href="/">
             <Mark className="mark" />
             <span>{t.footer.name}</span>
           </Link>
@@ -305,19 +313,17 @@ export function Footer() {
         <div className="footer-cols">
           <nav className="footer-col" aria-label={t.footer.explore}>
             <h3>{t.footer.explore}</h3>
-            <Link to="/" activeOptions={{ exact: true }}>
-              {t.nav.home}
-            </Link>
-            <Link to="/about">{t.nav.about}</Link>
-            <Link to="/gallery">{t.nav.gallery}</Link>
-            <Link to="/news">{t.nav.news}</Link>
-            <Link to="/events">{t.nav.events}</Link>
+            <Link href="/">{t.nav.home}</Link>
+            <Link href="/about">{t.nav.about}</Link>
+            <Link href="/gallery">{t.nav.gallery}</Link>
+            <Link href="/news">{t.nav.news}</Link>
+            <Link href="/events">{t.nav.events}</Link>
           </nav>
 
           <nav className="footer-col" aria-label={t.footer.visit}>
             <h3>{t.footer.visit}</h3>
-            <Link to="/locations">{t.nav.locations}</Link>
-            <Link to="/contact">{t.nav.contact}</Link>
+            <Link href="/locations">{t.nav.locations}</Link>
+            <Link href="/contact">{t.nav.contact}</Link>
             <p className="footer-meta">
               <span>{t.footer.hours}</span>
               {t.footer.hoursText}
@@ -326,8 +332,8 @@ export function Footer() {
 
           <nav className="footer-col" aria-label={t.footer.administration}>
             <h3>{t.footer.administration}</h3>
-            <Link to="/leadership">{t.nav.leadership}</Link>
-            <Link to="/auth" className="footer-staff">
+            <Link href="/leadership">{t.nav.leadership}</Link>
+            <Link href="/auth" className="footer-staff">
               {t.footer.staff}
             </Link>
             <p className="footer-meta">{t.footer.staffLead}</p>
@@ -336,7 +342,7 @@ export function Footer() {
           <div className="footer-col footer-contact">
             <h3>{t.footer.contactTitle}</h3>
             <p className="footer-meta">{t.footer.place}</p>
-            <Link className="footer-cta" to="/contact">
+            <Link className="footer-cta" href="/contact">
               {t.nav.contact}
             </Link>
           </div>

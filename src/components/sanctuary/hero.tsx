@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import LaserFlow from "@/components/LaserFlow";
 import { useI18n } from "@/i18n";
 import { art } from "./art";
@@ -45,7 +45,7 @@ export function Hero() {
               <a className="pill" href="#welcome">
                 {t.hero.explore}
               </a>
-              <Link className="pill pill-ghost" to="/contact">
+              <Link className="pill pill-ghost" href="/contact">
                 {t.hero.plan}
               </Link>
             </div>
