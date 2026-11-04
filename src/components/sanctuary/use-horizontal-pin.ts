@@ -64,6 +64,12 @@ export function useHorizontalPin(
     const kill = () => {
       clearSpacer();
       s.classList.remove("passion-pin--native");
+      // Leave page on native scroll if we had scoped normalizeScroll to this pin.
+      try {
+        ScrollTrigger.normalizeScroll(false);
+      } catch {
+        /* ignore */
+      }
       ctx?.revert();
       ctx = null;
       gsap.set(t, { clearProps: "transform,x" });
@@ -79,6 +85,7 @@ export function useHorizontalPin(
       if (distance() < 24) return;
 
       const touch = isTouchLayout();
+      let normalizedHere = false;
 
       ctx = gsap.context(() => {
         gsap.to(t, {
@@ -95,12 +102,23 @@ export function useHorizontalPin(
             anticipatePin: touch ? 0 : 1,
             invalidateOnRefresh: true,
             pinSpacing: true,
-            // fixed pin + native/normalized scroll is stable on iOS; transform for Lenis desktop.
+            // fixed pin on touch; transform stays in sync with Lenis on desktop.
             pinType: touch ? "fixed" : "transform",
             fastScrollEnd: true,
             preventOverlaps: true,
             onRefresh: (self) => paintSpacer(self),
-            onToggle: (self) => paintSpacer(self),
+            onToggle: (self) => {
+              paintSpacer(self);
+              // Normalize only while this pin is active — keeps Hero→Welcome native-smooth.
+              if (!touch) return;
+              if (self.isActive && !normalizedHere) {
+                ScrollTrigger.normalizeScroll(true);
+                normalizedHere = true;
+              } else if (!self.isActive && normalizedHere) {
+                ScrollTrigger.normalizeScroll(false);
+                normalizedHere = false;
+              }
+            },
           },
         });
       }, s);

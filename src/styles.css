@@ -351,6 +351,32 @@ html.fx [data-reveal].is-in {
   filter: none;
 }
 
+@media (max-width: 760px) {
+  /* Blur + filter transitions are a common source of scroll hitching on phones. */
+  html.fx [data-reveal] {
+    filter: none;
+    transform: translate3d(0, 1.25rem, 0);
+    transition:
+      opacity 500ms ease var(--d, 0ms),
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+  }
+
+  .petals,
+  .rays,
+  .halo {
+    display: none !important;
+  }
+
+  .ken {
+    animation: none !important;
+  }
+
+  /* Descent is tall; keep spiral cheaper while the finger is moving. */
+  .descent-spiral .infinite-spiral__item {
+    will-change: transform, opacity;
+  }
+}
+
 .para {
   translate: 0 calc((var(--p, 0.5) - 0.5) * -6rem);
 }

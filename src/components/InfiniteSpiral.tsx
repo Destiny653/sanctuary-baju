@@ -151,7 +151,13 @@ const InfiniteSpiral = ({
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
+        const wasVisible = visibleRef.current;
         visibleRef.current = entry.isIntersecting;
+        // Resume the loop when the spiral re-enters view; idle when off-screen.
+        if (visibleRef.current && !wasVisible && !frameId) {
+          previousTime = performance.now();
+          frameId = requestAnimationFrame(render);
+        }
       },
       { threshold: 0.02 }
     );
@@ -174,6 +180,12 @@ const InfiniteSpiral = ({
         -1.5,
         1.5
       );
+
+      // Wake the loop for scroll-driven mode (no continuous auto RAF).
+      if (!frameId) {
+        previousTime = performance.now();
+        frameId = requestAnimationFrame(render);
+      }
     };
 
     window.addEventListener("scroll", handleScroll, {
@@ -181,6 +193,14 @@ const InfiniteSpiral = ({
     });
 
     const render = (time: number) => {
+      frameId = 0;
+
+      // Don't burn the main thread while the spiral is off-screen (landing scroll jank).
+      if (!visibleRef.current) {
+        autoSpeedRef.current = 0;
+        return;
+      }
+
       const delta = Math.min((time - previousTime) / 1000, 0.05);
 
       previousTime = time;
@@ -196,7 +216,6 @@ const InfiniteSpiral = ({
 
       const desiredAutoSpeed =
         autoEnabled &&
-          visibleRef.current &&
           !reducedMotion.matches &&
           !motionPaused
           ? speed * directionMultiplier
@@ -295,10 +314,21 @@ const InfiniteSpiral = ({
           opacity > 0.25 ? "auto" : "none";
       });
 
-      frameId = requestAnimationFrame(render);
+      const catchingUp =
+        Math.abs(targetProgressRef.current - progressRef.current) > 0.0008 ||
+        Math.abs(autoSpeedRef.current) > 0.0008;
+      const keepSpinning =
+        autoEnabled &&
+        !reducedMotion.matches &&
+        !motionPaused;
+
+      // Idle when scroll-only and caught up — avoids burning frames during page scroll.
+      if (keepSpinning || catchingUp) {
+        frameId = requestAnimationFrame(render);
+      }
     };
 
-    frameId = requestAnimationFrame(render);
+    if (visibleRef.current) frameId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(frameId);

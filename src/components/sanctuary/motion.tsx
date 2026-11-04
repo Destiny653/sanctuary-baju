@@ -94,7 +94,6 @@ export function useSmoothScroll() {
     let lenis: Lenis | undefined;
     let tick: ((time: number) => void) | undefined;
     let refreshTimer = 0;
-    let normalizeOn = false;
 
     const stopLenis = () => {
       if (tick) gsap.ticker.remove(tick);
@@ -118,32 +117,17 @@ export function useSmoothScroll() {
     };
 
     const syncMobileScroll = () => {
-      // Align touch scrolling with the GSAP thread so pinned sections don't jitter.
-      if (isTouchLayout()) {
-        if (!normalizeOn) {
-          ScrollTrigger.normalizeScroll(true);
-          normalizeOn = true;
-        }
-        stopLenis();
-      } else {
-        if (normalizeOn) {
-          ScrollTrigger.normalizeScroll(false);
-          normalizeOn = false;
-        }
-        if (!lenis) startLenis();
-      }
+      // Native touch scroll above the film — global normalizeScroll made Hero/Descent glitch.
+      // Passion pin enables normalizeScroll only while that section is active.
+      if (isTouchLayout()) stopLenis();
+      else if (!lenis) startLenis();
       ScrollTrigger.refresh();
     };
 
     const id = window.requestAnimationFrame(() => {
       if (cancelled) return;
       window.scrollTo(0, 0);
-      if (isTouchLayout()) {
-        ScrollTrigger.normalizeScroll(true);
-        normalizeOn = true;
-      } else {
-        startLenis();
-      }
+      if (!isTouchLayout()) startLenis();
       ScrollTrigger.refresh();
       refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
     });
@@ -157,7 +141,6 @@ export function useSmoothScroll() {
       window.clearTimeout(refreshTimer);
       coarse.removeEventListener("change", syncMobileScroll);
       narrow.removeEventListener("change", syncMobileScroll);
-      if (normalizeOn) ScrollTrigger.normalizeScroll(false);
       stopLenis();
     };
   }, []);
@@ -194,14 +177,17 @@ export function useGsapReveals() {
             scrollTrigger: { trigger: el, start: "top 90%" },
           });
         });
-        gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
-          const speed = Number(el.dataset["parallax"] || 0.2);
-          gsap.to(el, {
-            yPercent: -100 * speed,
-            ease: "none",
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
+        // Parallax scrub fights native touch scroll on phones — desktop only.
+        if (!narrow) {
+          gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
+            const speed = Number(el.dataset["parallax"] || 0.2);
+            gsap.to(el, {
+              yPercent: -100 * speed,
+              ease: "none",
+              scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
+            });
           });
-        });
+        }
       });
       ScrollTrigger.refresh();
     };

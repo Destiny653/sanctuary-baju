@@ -1,5 +1,5 @@
 import { art } from "./art";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { places } from "./data";
 import { MaryFigure } from "./mary";
 import { Petals, Shards } from "./shards";
@@ -151,31 +151,41 @@ function DescentCopy() {
 
 export function Descent() {
   const { t } = useI18n();
+  // Auto-spin + blur filters hitch mobile scroll above the film — scroll-linked only on phones.
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 760px), (pointer: coarse)");
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   return (
     <section className="descent band-sky" id="descent" data-scroll>
       <img className="fill ken" src={art.heaven} alt="" loading="lazy" />
       <div className="rays" aria-hidden="true" />
       <div className="halo" aria-hidden="true" />
-      <Petals />
+      {!mobile ? <Petals /> : null}
       <div className="descent-spiral">
         <InfiniteSpiral
           items={MYSTERY_IMAGES}
-          speed={0.35}
+          speed={mobile ? 0.22 : 0.35}
           direction="up"
-          animationMode="auto"
-          radius={550}
-          cardWidth={170}
-          cardHeight={170}
-          verticalSpacing={70}
-          perspective={1200}
-          cardsPerTurn={8}
+          animationMode={mobile ? "scroll" : "auto"}
+          radius={mobile ? 420 : 550}
+          cardWidth={mobile ? 130 : 170}
+          cardHeight={mobile ? 130 : 170}
+          verticalSpacing={mobile ? 58 : 70}
+          perspective={mobile ? 900 : 1200}
+          cardsPerTurn={mobile ? 6 : 8}
           rotation={0}
           cardTilt={0}
           cardRadius={50}
-          centerScale={1.2}
-          edgeFade={0.4}
-          edgeBlur={4}
-          pauseOnHover
+          centerScale={mobile ? 1.05 : 1.2}
+          edgeFade={mobile ? 0.55 : 0.4}
+          edgeBlur={mobile ? 0 : 4}
+          pauseOnHover={!mobile}
           imageFit="cover"
           centerContent={
             <MaryFigure className="descent-figure-center" alt={t.home.descentAlt} />
