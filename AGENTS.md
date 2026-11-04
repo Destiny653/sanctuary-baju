@@ -1,6 +1,6 @@
 ## Project rules
 - This is a **Next.js App Router** app (`src/app`). Run with `npm run dev` / `npm run build` / `npm start`. Deploy target is Vercel (`vercel.json`).
-- The homepage uploaded film uses a dedicated ScrollVideo section after Hero, with asset pointers and GSAP ScrollTrigger seeking rather than autoplay; short-keyframe media keeps bidirectional scrubbing responsive and reduced-motion visitors receive native playback controls.
+- The homepage uploaded film uses ScrollVideo after Hero: GSAP ScrollTrigger pin + scrub synced to Lenis; local `/assets/vids/static-scroll.{webm,mp4}` + poster (not Lovable `__l5e` asset URLs); reduced-motion visitors get native controls.
 - Public pages live under `src/app/{route}/page.tsx` (`/`, `/gallery`, `/news`, `/events`, `/locations`, `/contact`, `/about`, `/leadership`, `/auth`). Dashboard routes live under `src/app/dashboard/**`. Shared UI wraps public pages in `Shell` from `src/components/sanctuary/shell.tsx`, which owns nav, footer, dialogs, Lenis smooth scroll and GSAP reveals.
 - Motion uses GSAP + ScrollTrigger driven by Lenis via the GSAP ticker; ReactBits-style pieces (SplitText, VelocityMarquee, Tilt) live in `motion.tsx` rather than an installed package.
 - Film narration uses a reversible GSAP word-reveal timeline in motion.tsx driven by decoded video time, with bilingual chapters in film-narration.ts; this keeps text aligned during seeking and native reduced-motion playback.

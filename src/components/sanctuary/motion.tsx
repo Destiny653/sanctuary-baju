@@ -85,19 +85,33 @@ export function useSmoothScroll() {
   useEffect(() => {
     ensureGsap();
     if (prefersReduced()) return;
-    const lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });
-    lenis.on("scroll", ScrollTrigger.update);
-    const tick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
-    (window as Window & { __lenis?: Lenis }).__lenis = lenis;
-    window.scrollTo(0, 0);
+    let cancelled = false;
+    let lenis: Lenis | undefined;
+    let tick: ((time: number) => void) | undefined;
+    let refreshTimer = 0;
+    // Defer one frame so App Router hydration / Suspense remounts don't kill Lenis mid-init.
+    const id = window.requestAnimationFrame(() => {
+      if (cancelled) return;
+      lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });
+      lenis.on("scroll", ScrollTrigger.update);
+      tick = (time: number) => lenis!.raf(time * 1000);
+      gsap.ticker.add(tick);
+      gsap.ticker.lagSmoothing(0);
+      (window as Window & { __lenis?: Lenis }).__lenis = lenis;
+      window.scrollTo(0, 0);
+      ScrollTrigger.refresh();
+      // Film + passion pins register slightly later — refresh once they exist.
+      refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
+    });
     return () => {
-      gsap.ticker.remove(tick);
-      if ((window as Window & { __lenis?: Lenis }).__lenis === lenis) {
+      cancelled = true;
+      window.cancelAnimationFrame(id);
+      window.clearTimeout(refreshTimer);
+      if (tick) gsap.ticker.remove(tick);
+      if (lenis && (window as Window & { __lenis?: Lenis }).__lenis === lenis) {
         delete (window as Window & { __lenis?: Lenis }).__lenis;
       }
-      lenis.destroy();
+      lenis?.destroy();
     };
   }, []);
 }
@@ -107,40 +121,52 @@ export function useGsapReveals() {
   useEffect(() => {
     ensureGsap();
     if (prefersReduced()) return;
-    const ctx = gsap.context(() => {
-      const narrow = window.matchMedia("(max-width: 760px)").matches;
-      const slide = narrow ? 24 : 80;
-      const lift = narrow ? 36 : 70;
-      gsap.utils.toArray<HTMLElement>("[data-gsap]").forEach((el) => {
-        const kind = el.dataset["gsap"];
-        const from: gsap.TweenVars =
-          kind === "left"
-            ? { x: -slide, opacity: 0, rotate: narrow ? 0 : -2 }
-            : kind === "right"
-              ? { x: slide, opacity: 0, rotate: narrow ? 0 : 2 }
-              : kind === "zoom"
-                ? { scale: narrow ? 0.92 : 0.85, opacity: 0, filter: narrow ? "none" : "blur(12px)" }
-                : { y: lift, opacity: 0, filter: narrow ? "none" : "blur(8px)" };
-        gsap.from(el, {
-          ...from,
-          duration: narrow ? 0.85 : 1.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 90%" },
+    let ctx: gsap.Context | undefined;
+    let refresh = 0;
+    let refresh2 = 0;
+    const build = () => {
+      ctx?.revert();
+      ctx = gsap.context(() => {
+        const narrow = window.matchMedia("(max-width: 760px)").matches;
+        const slide = narrow ? 24 : 80;
+        const lift = narrow ? 36 : 70;
+        gsap.utils.toArray<HTMLElement>("[data-gsap]").forEach((el) => {
+          const kind = el.dataset["gsap"];
+          const from: gsap.TweenVars =
+            kind === "left"
+              ? { x: -slide, opacity: 0, rotate: narrow ? 0 : -2 }
+              : kind === "right"
+                ? { x: slide, opacity: 0, rotate: narrow ? 0 : 2 }
+                : kind === "zoom"
+                  ? { scale: narrow ? 0.92 : 0.85, opacity: 0, filter: narrow ? "none" : "blur(12px)" }
+                  : { y: lift, opacity: 0, filter: narrow ? "none" : "blur(8px)" };
+          gsap.from(el, {
+            ...from,
+            duration: narrow ? 0.85 : 1.1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 90%" },
+          });
+        });
+        gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
+          const speed = Number(el.dataset["parallax"] || 0.2);
+          gsap.to(el, {
+            yPercent: -100 * speed,
+            ease: "none",
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
+          });
         });
       });
-      gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
-        const speed = Number(el.dataset["parallax"] || 0.2);
-        gsap.to(el, {
-          yPercent: -100 * speed,
-          ease: "none",
-          scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
-        });
-      });
-    });
-    const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 400);
+      ScrollTrigger.refresh();
+    };
+    // Wait a frame so late client sections (film, passion) are in the DOM.
+    const frame = window.requestAnimationFrame(build);
+    refresh = window.setTimeout(() => ScrollTrigger.refresh(), 400);
+    refresh2 = window.setTimeout(build, 900);
     return () => {
+      window.cancelAnimationFrame(frame);
       window.clearTimeout(refresh);
-      ctx.revert();
+      window.clearTimeout(refresh2);
+      ctx?.revert();
     };
   }, []);
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { art, evangel } from "./art";
 import { formatDay, postsQuery } from "./content";
 import { SplitText, Tilt, VelocityMarquee } from "./motion";
@@ -80,8 +80,9 @@ export function FinalInvite() {
 
 export function Happenings() {
   const { t, lang } = useI18n();
-  const { data: news } = useSuspenseQuery(postsQuery("news"));
-  const { data: events } = useSuspenseQuery(postsQuery("event"));
+  // useQuery (not suspense) so the rest of the landing page — film, GSAP, Lenis — mounts immediately
+  const { data: news = [] } = useQuery(postsQuery("news"));
+  const { data: events = [] } = useQuery(postsQuery("event"));
   const latestNews = news.slice(0, 2);
   const upcoming = events.filter((e) => e.event_start).slice(0, 4);
   return (

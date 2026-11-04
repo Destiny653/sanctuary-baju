@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, type ReactNode } from "react";
 import { BookDialog, Footer, Nav, SearchDialog } from "./chrome";
 import { useGsapReveals, useSmoothScroll } from "./motion";

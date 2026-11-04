@@ -1,3 +1,5 @@
+"use client";
+
 import { Hero } from "./hero";
 import { ScrollVideo } from "./scroll-video";
 import { Evangel, FinalInvite, Happenings, Marquees, Welcome } from "./landing-sections";

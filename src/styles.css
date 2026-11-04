@@ -14,16 +14,15 @@
  * shadcn tokens (--background, --primary, ...) are mapped onto the same palette.
  */
 
-/* Rumela Smart — drop licensed .woff2/.woff files into /public/fonts/rumela-smart/ */
+/*
+ * Rumela Smart — only declare @font-face when files exist under
+ * /public/fonts/rumela-smart/ (otherwise the browser 404s every weight).
+ * Expected names: RumelaSmart-Regular|Medium|SemiBold|Bold|ExtraBold .woff2/.woff
+ * Until then: local install if present, else Helvetica Neue / system stack.
+ */
 @font-face {
   font-family: "Rumela Smart";
-  src:
-    local("Rumela Smart"),
-    local("RumelaSmart-Regular"),
-    url("/fonts/rumela-smart/RumelaSmart-Regular.woff2") format("woff2"),
-    url("/fonts/rumela-smart/RumelaSmart-Regular.woff") format("woff"),
-    url("/fonts/rumela-smart/Rumela Smart Trial.woff2") format("woff2"),
-    url("/fonts/rumela-smart/Rumela Smart Trial.ttf") format("truetype");
+  src: local("Rumela Smart"), local("RumelaSmart-Regular");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -31,11 +30,7 @@
 
 @font-face {
   font-family: "Rumela Smart";
-  src:
-    local("Rumela Smart Medium"),
-    local("RumelaSmart-Medium"),
-    url("/fonts/rumela-smart/RumelaSmart-Medium.woff2") format("woff2"),
-    url("/fonts/rumela-smart/RumelaSmart-Medium.woff") format("woff");
+  src: local("Rumela Smart Medium"), local("RumelaSmart-Medium");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -43,11 +38,7 @@
 
 @font-face {
   font-family: "Rumela Smart";
-  src:
-    local("Rumela Smart SemiBold"),
-    local("RumelaSmart-SemiBold"),
-    url("/fonts/rumela-smart/RumelaSmart-SemiBold.woff2") format("woff2"),
-    url("/fonts/rumela-smart/RumelaSmart-SemiBold.woff") format("woff");
+  src: local("Rumela Smart SemiBold"), local("RumelaSmart-SemiBold");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -55,11 +46,7 @@
 
 @font-face {
   font-family: "Rumela Smart";
-  src:
-    local("Rumela Smart Bold"),
-    local("RumelaSmart-Bold"),
-    url("/fonts/rumela-smart/RumelaSmart-Bold.woff2") format("woff2"),
-    url("/fonts/rumela-smart/RumelaSmart-Bold.woff") format("woff");
+  src: local("Rumela Smart Bold"), local("RumelaSmart-Bold");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -67,11 +54,7 @@
 
 @font-face {
   font-family: "Rumela Smart";
-  src:
-    local("Rumela Smart ExtraBold"),
-    local("RumelaSmart-ExtraBold"),
-    url("/fonts/rumela-smart/RumelaSmart-ExtraBold.woff2") format("woff2"),
-    url("/fonts/rumela-smart/RumelaSmart-ExtraBold.woff") format("woff");
+  src: local("Rumela Smart ExtraBold"), local("RumelaSmart-ExtraBold");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -4873,7 +4856,7 @@ section {
   display: inline-flex;
 }
 
-/* Uploaded film: full-width stage with a white border only. */
+/* Uploaded film: GSAP pin + scrub (Lenis drives ScrollTrigger). */
 .scroll-film {
   position: relative;
   z-index: 0;
@@ -4881,34 +4864,11 @@ section {
   place-items: center;
   width: 100%;
   height: 100svh;
-  padding-inline: 1rem; /* px-4 */
-  overflow: hidden;
+  padding: 0.75rem 1rem;
   background: var(--snow);
   isolation: isolate;
   box-sizing: border-box;
-}
-
-.scroll-film-shell {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: calc(100svh - 2rem);
-  border-radius: 1.75rem;
-  border: 4px solid color-mix(in srgb, white 70%, transparent);
-  box-shadow: none;
-  background: transparent;
-  box-sizing: border-box;
-}
-
-.scroll-film-frame {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin-inline: 0;
-  border-radius: calc(1.75rem - 4px);
   overflow: hidden;
-  background: transparent;
-  box-shadow: none;
 }
 
 .scroll-film-media {
@@ -4918,7 +4878,13 @@ section {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  background: transparent;
+  border-radius: 1.75rem;
+  background: #0b1f3a;
+  opacity: 1;
+}
+
+.scroll-film-media.is-visible {
+  opacity: 1;
 }
 
 .scroll-film-fallback {
@@ -4941,13 +4907,16 @@ section {
   border-radius: 999px;
   background: color-mix(in srgb, white 28%, transparent);
   overflow: hidden;
+  pointer-events: none;
 }
 
 .scroll-film-progress>div {
   height: 100%;
+  width: 100%;
   background: linear-gradient(90deg, var(--sky-bright), var(--blue));
   transform: scaleX(0);
   transform-origin: left;
+  will-change: transform;
 }
 
 .scroll-film.is-reduced {
@@ -4956,12 +4925,7 @@ section {
   padding: 2rem 1rem;
 }
 
-.scroll-film.is-reduced .scroll-film-shell {
-  height: auto;
-}
-
-.scroll-film.is-reduced .scroll-film-frame {
-  width: 100%;
+.scroll-film.is-reduced .scroll-film-media {
   height: auto;
   aspect-ratio: 16 / 9;
 }
@@ -5025,15 +4989,8 @@ section {
 }
 
 @media (max-width: 760px) {
-  .scroll-film-shell {
-    height: calc(100svh - 2rem);
+  .scroll-film-media {
     border-radius: 1.25rem;
-  }
-
-  .scroll-film-frame {
-    width: 100%;
-    height: 100%;
-    border-radius: calc(1.25rem - 4px);
   }
 
   .film-narration {
