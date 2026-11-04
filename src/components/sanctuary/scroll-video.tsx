@@ -152,11 +152,16 @@ export function ScrollVideo() {
           muted
           playsInline
           controls={reduced}
-          onError={() => setFailed(true)}
+          onError={() => {
+            // Only fall back once every <source> has failed.
+            if (videoRef.current?.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+              setFailed(true);
+            }
+          }}
           aria-label="Mary praying in a sunlit courtyard"
         >
-          <source src={SCROLL_WEBM} type="video/webm" />
-          <source src={SCROLL_MP4} type="video/mp4" />
+          <source src={`${SCROLL_WEBM}?v=1`} type='video/webm; codecs="vp9"' />
+          <source src={`${SCROLL_MP4}?v=1`} type='video/mp4; codecs="avc1.42E01E"' />
         </video>
       )}
       {!failed && <FilmNarration videoRef={videoRef} {...narration} reduced={reduced} />}
