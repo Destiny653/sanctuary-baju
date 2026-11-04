@@ -80,38 +80,85 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Lenis smooth scrolling, driven by the GSAP ticker so ScrollTrigger stays in sync. */
+/** Lenis on desktop only — on touch it fights GSAP pins and makes horizontal scrub vibrate. */
 export function useSmoothScroll() {
   useEffect(() => {
     ensureGsap();
     if (prefersReduced()) return;
+
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)");
+    const narrow = window.matchMedia("(max-width: 760px)");
+    const isTouchLayout = () => coarse.matches || narrow.matches;
+
     let cancelled = false;
     let lenis: Lenis | undefined;
     let tick: ((time: number) => void) | undefined;
     let refreshTimer = 0;
-    // Defer one frame so App Router hydration / Suspense remounts don't kill Lenis mid-init.
-    const id = window.requestAnimationFrame(() => {
-      if (cancelled) return;
+    let normalizeOn = false;
+
+    const stopLenis = () => {
+      if (tick) gsap.ticker.remove(tick);
+      tick = undefined;
+      if (lenis && (window as Window & { __lenis?: Lenis }).__lenis === lenis) {
+        delete (window as Window & { __lenis?: Lenis }).__lenis;
+      }
+      lenis?.destroy();
+      lenis = undefined;
+    };
+
+    const startLenis = () => {
+      stopLenis();
+      if (cancelled || isTouchLayout()) return;
       lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });
       lenis.on("scroll", ScrollTrigger.update);
       tick = (time: number) => lenis!.raf(time * 1000);
       gsap.ticker.add(tick);
       gsap.ticker.lagSmoothing(0);
       (window as Window & { __lenis?: Lenis }).__lenis = lenis;
-      window.scrollTo(0, 0);
+    };
+
+    const syncMobileScroll = () => {
+      // Align touch scrolling with the GSAP thread so pinned sections don't jitter.
+      if (isTouchLayout()) {
+        if (!normalizeOn) {
+          ScrollTrigger.normalizeScroll(true);
+          normalizeOn = true;
+        }
+        stopLenis();
+      } else {
+        if (normalizeOn) {
+          ScrollTrigger.normalizeScroll(false);
+          normalizeOn = false;
+        }
+        if (!lenis) startLenis();
+      }
       ScrollTrigger.refresh();
-      // Film + passion pins register slightly later — refresh once they exist.
+    };
+
+    const id = window.requestAnimationFrame(() => {
+      if (cancelled) return;
+      window.scrollTo(0, 0);
+      if (isTouchLayout()) {
+        ScrollTrigger.normalizeScroll(true);
+        normalizeOn = true;
+      } else {
+        startLenis();
+      }
+      ScrollTrigger.refresh();
       refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
     });
+
+    coarse.addEventListener("change", syncMobileScroll);
+    narrow.addEventListener("change", syncMobileScroll);
+
     return () => {
       cancelled = true;
       window.cancelAnimationFrame(id);
       window.clearTimeout(refreshTimer);
-      if (tick) gsap.ticker.remove(tick);
-      if (lenis && (window as Window & { __lenis?: Lenis }).__lenis === lenis) {
-        delete (window as Window & { __lenis?: Lenis }).__lenis;
-      }
-      lenis?.destroy();
+      coarse.removeEventListener("change", syncMobileScroll);
+      narrow.removeEventListener("change", syncMobileScroll);
+      if (normalizeOn) ScrollTrigger.normalizeScroll(false);
+      stopLenis();
     };
   }, []);
 }
@@ -263,7 +310,8 @@ export function Tilt({ children, className, style }: { children: ReactNode; clas
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
-    if (!el || prefersReduced()) return;
+    // Skip tilt on touch — pointermove during scroll fights the horizontal pin and vibrates cards.
+    if (!el || prefersReduced() || window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
     const move = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width - 0.5;

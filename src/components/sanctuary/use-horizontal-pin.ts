@@ -11,9 +11,16 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function isTouchLayout() {
+  return (
+    window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+    window.matchMedia("(max-width: 760px)").matches
+  );
+}
+
 /**
- * Pinned horizontal scrub on all viewports (desktop + mobile).
- * Vertical page scroll drives the track sideways while the section stays pinned.
+ * Pinned horizontal scrub on all viewports.
+ * Mobile uses a near-1:1 scrub + fixed pin (no Lenis) to avoid vibration.
  */
 export function useHorizontalPin(
   section: RefObject<HTMLElement | null>,
@@ -71,21 +78,27 @@ export function useHorizontalPin(
       kill();
       if (distance() < 24) return;
 
+      const touch = isTouchLayout();
+
       ctx = gsap.context(() => {
         gsap.to(t, {
           x: () => -distance(),
           ease: "none",
+          force3D: true,
           scrollTrigger: {
             trigger: s,
             start: "top top",
             end: () => `+=${Math.max(distance(), window.innerHeight)}`,
             pin: true,
-            scrub: true,
-            anticipatePin: 1,
+            // Near-zero scrub on touch = 1:1 with finger (laggy scrub vibrates).
+            scrub: touch ? 0.05 : true,
+            anticipatePin: touch ? 0 : 1,
             invalidateOnRefresh: true,
             pinSpacing: true,
-            // transform pin stays in sync with Lenis (window scroller).
-            pinType: "transform",
+            // fixed pin + native/normalized scroll is stable on iOS; transform for Lenis desktop.
+            pinType: touch ? "fixed" : "transform",
+            fastScrollEnd: true,
+            preventOverlaps: true,
             onRefresh: (self) => paintSpacer(self),
             onToggle: (self) => paintSpacer(self),
           },

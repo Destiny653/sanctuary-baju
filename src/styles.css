@@ -3608,6 +3608,8 @@ section {
   width: max-content;
   max-width: none;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
   background: var(--snow);
   box-sizing: border-box;
 }
