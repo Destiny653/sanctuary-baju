@@ -1,8 +1,9 @@
 import { art } from "./art";
 import { useEffect, useState, type CSSProperties } from "react";
+import PixelSnow from "@/components/PixelSnow";
 import { places } from "./data";
 import { MaryFigure } from "./mary";
-import { Petals, Shards } from "./shards";
+import { Shards } from "./shards";
 import type { Notebook } from "./use-notebook";
 import InfiniteSpiral from "../InfiniteSpiral";
 import { useI18n } from "@/i18n";
@@ -166,7 +167,28 @@ export function Descent() {
       <img className="fill ken" src={art.mountOfMary} alt="" loading="lazy" />
       <div className="rays" aria-hidden="true" />
       <div className="halo" aria-hidden="true" />
-      {!mobile ? <Petals /> : null}
+      {!mobile ? (
+        <div className="descent-stars" aria-hidden="true">
+          <PixelSnow
+            color="#fff6d6"
+            variant="round"
+            density={0.72}
+            speed={0.45}
+            wind={0.08}
+            sway={0.55}
+            flakeSize={0.9}
+            pixelSize={2}
+            depth={0.75}
+            brightness={1.2}
+            glow={1.4}
+            twinkle={0.85}
+            accumulate={false}
+            mouseInteraction={false}
+            intro
+            opacity={0.9}
+          />
+        </div>
+      ) : null}
       <div className="descent-spiral">
         <InfiniteSpiral
           items={MYSTERY_IMAGES}

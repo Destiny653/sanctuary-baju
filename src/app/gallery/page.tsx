@@ -1,69 +1,76 @@
 "use client";
 
-import { useMemo } from "react";
-import FlexCarousel from "@/components/FlexCarousel";
+import { useEffect, useRef, useState } from "react";
 import Masonry from "@/components/Masonry";
-import { GALLERY_HERO_STATIONS, LOCAL_GALLERY_SEGMENTS } from "@/components/sanctuary/gallery-local";
+import PixelSwap from "@/components/PixelSwap";
+import { art } from "@/components/sanctuary/art";
+import { LOCAL_GALLERY_SEGMENTS } from "@/components/sanctuary/gallery-local";
 import { SplitText } from "@/components/sanctuary/motion";
 import { Shell } from "@/components/sanctuary/shell";
 import { pick, useI18n } from "@/i18n";
 
-const GALLERY_SKY = "/assets/gallery/IMG_1125.jpg";
+const HERO_DWELL_MS = 4200;
+
+function GalleryHeroSwap({ images }: { images: readonly string[] }) {
+  const [index, setIndex] = useState(0);
+  const [active, setActive] = useState(false);
+  const dwellRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const first = images[index % images.length];
+  const second = images[(index + 1) % images.length];
+
+  useEffect(() => {
+    dwellRef.current = setTimeout(() => setActive(true), HERO_DWELL_MS);
+    return () => {
+      if (dwellRef.current) clearTimeout(dwellRef.current);
+    };
+  }, [index]);
+
+  return (
+    <div className="gallery-hero-media" aria-hidden="true">
+      <PixelSwap
+        key={index}
+        className="gallery-hero-swap"
+        firstContent={<img className="gallery-hero-swap-img" src={first} alt="" />}
+        secondContent={<img className="gallery-hero-swap-img" src={second} alt="" />}
+        pattern="spiral"
+        pixelSize={32}
+        gap={2}
+        pixelRadius={8}
+        pixelScale={1.05}
+        duration={1000}
+        pixelDuration={780}
+        randomness={0.4}
+        bounce={0.18}
+        trigger="none"
+        intro
+        active={active}
+        aspectRatio="unset"
+        onComplete={(shown) => {
+          if (!shown) return;
+          setIndex((i) => i + 1);
+          setActive(false);
+        }}
+        style={{ width: "100%", height: "100%", aspectRatio: "unset" }}
+      />
+    </div>
+  );
+}
 
 export default function GalleryPage() {
   const { t, lang } = useI18n();
-
-  const heroItems = useMemo(
-    () =>
-      GALLERY_HERO_STATIONS.map((item) => ({
-        src: item.src,
-        alt: lang === "fr" ? item.title_fr : item.title_en,
-        title: lang === "fr" ? item.title_fr : item.title_en,
-        subtitle: lang === "fr" ? item.subtitle_fr : item.subtitle_en,
-      })),
-    [lang],
-  );
 
   return (
     <Shell>
       {() => (
         <div className="gallery-page">
           <section className="gallery-hero" data-scroll>
-            <img className="gallery-hero-sky ken" src={GALLERY_SKY} alt="" />
-            <div className="gallery-hero-sun" aria-hidden="true" />
-            <div className="gallery-hero-rays" aria-hidden="true" />
+            <GalleryHeroSwap images={art.galleryHero} />
             <div className="gallery-hero-wash" aria-hidden="true" />
             <div className="gallery-hero-copy">
               <p className="kicker">{t.gallery.kicker}</p>
               <SplitText text={t.gallery.title} className="display-xl" />
               <p className="serif-lead">{t.gallery.lead}</p>
-            </div>
-            <div className="gallery-hero-reel">
-              <FlexCarousel
-                items={heroItems}
-                preset="liquid"
-                intro="rise"
-                cardHeight={0.88}
-                gap={20}
-                squeeze={0.08}
-                focusOnClick
-                captions
-                fit="portrait"
-                radius={18}
-                lensWidth={0.9}
-                lensHeight={1.4}
-                tilt={52}
-                roundness={1}
-                bend={0.28}
-                reach={0.42}
-                curl="twist"
-                dispersion={0.4}
-                liquid={0}
-                followCursor={false}
-                autoplay={false}
-                interval={4}
-                captureWheel={false}
-              />
             </div>
           </section>
 

@@ -227,6 +227,13 @@ export const fr: Dict = {
     saved: "Destination enregistrée",
     invalid: "Entrez une latitude et une longitude valides.",
   },
+  fontSettings: {
+    pageLead: "Typographie d'affichage pour les titres et l'en-tête, plus le point carte de la page Lieux.",
+    title: "Police d'affichage",
+    lead: "Choisissez la serif utilisée pour la marque dans l'en-tête et tous les grands titres du site public.",
+    save: "Enregistrer la police",
+    saved: "Police d'affichage enregistrée",
+  },
   contact: {
     formTitle: "Écrire à la maison",
     formLead: "Questions, groupes, retraites ou un mot pour le recteur. Nous répondons sous deux jours.",

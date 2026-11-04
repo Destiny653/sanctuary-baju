@@ -228,6 +228,13 @@ export const en = {
     saved: "Destination saved",
     invalid: "Enter valid latitude and longitude numbers.",
   },
+  fontSettings: {
+    pageLead: "Site-wide display type for headings and the header, plus the map pin used on Locations.",
+    title: "Display font",
+    lead: "Choose the serif used for the brand in the header and all large headings across the public site.",
+    save: "Save display font",
+    saved: "Display font saved",
+  },
   contact: {
     formTitle: "Write to the house",
     formLead: "Questions, groups, retreats, or a word for the rector. We reply within two days.",

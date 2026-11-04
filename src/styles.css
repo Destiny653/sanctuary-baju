@@ -8,15 +8,48 @@
  * Design system: Sanctuary of Our Lady of Mercy.
  * Conversly blues across the house. Text is deep navy (#083A75), never black.
  * Gold is used for one thing only: the ring turning around the Virgin's head.
- * Display headers: Talesha (serif) — drop licensed webfonts in /fonts/talesha.
+ * Display headers: switchable via html[data-display-font] (dashboard → Settings).
+ *   coachella | talesha | cormorant — drop licensed files in /fonts/{coachella,talesha}.
  * Body / UI: Rumela Smart when present, else system sans.
- * Glass panels stay frosted so the sky shows through.
  */
 
 /*
- * Talesha — headers only. Uses local() so missing webfonts do not 404.
- * Drop licensed files into /public/fonts/talesha/ and prepend url() sources
- * (see that folder's README). Until then: Cormorant Garamond via --font-display-fallback.
+ * Coachella (MadeType) — modern high-contrast serif. local() only until files exist.
+ */
+@font-face {
+  font-family: "Coachella";
+  src: local("Coachella"), local("Coachella Regular");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Coachella";
+  src: local("Coachella Medium"), local("Coachella-Medium");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Coachella";
+  src: local("Coachella SemiBold"), local("Coachella-SemiBold");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Coachella";
+  src: local("Coachella Bold"), local("Coachella-Bold");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Talesha — headers. local() only until files exist under /public/fonts/talesha/.
  */
 @font-face {
   font-family: "Talesha";
@@ -136,10 +169,26 @@
   --color-ring: var(--ring);
 }
 
-:root {
-  --sans: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
+/* Display stacks — switched by dashboard via html[data-display-font]. */
+:root,
+html[data-display-font="coachella"],
+html:not([data-display-font]) {
+  --display: "Coachella", var(--font-coachella-fallback), "Playfair Display", Georgia, "Times New Roman", serif;
+  --serif: "Coachella", var(--font-coachella-fallback), "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+html[data-display-font="talesha"] {
   --display: "Talesha", var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --serif: "Talesha", var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+html[data-display-font="cormorant"] {
+  --display: var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --serif: var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+:root {
+  --sans: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Conversly blues — deep → light */
   --ink: #083a75;
@@ -2332,6 +2381,16 @@ html.fx [data-reveal].is-in {
   transform: translateX(-50%);
   background: radial-gradient(circle, oklch(1 0 0 / 0.9), oklch(1 0 0 / 0) 68%);
   pointer-events: none;
+}
+
+/* Pixel snow as star rain behind Mary + mystery spiral */
+.descent-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.95;
 }
 
 .descent-figure {
@@ -4550,15 +4609,53 @@ section {
 .gallery-hero {
   position: relative;
   isolation: isolate;
+  width: 100%;
   height: 100svh;
-  max-height: 100svh;
+  height: 100dvh;
+  min-height: 100svh;
+  min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  padding: 4.75rem 0 0.35rem;
+  align-content: end;
+  padding: 4.75rem 0 2.5rem;
   overflow: hidden;
   box-sizing: border-box;
-  background: #8ec8ef;
-  color: var(--ink, #083a75);
+  background: var(--ink);
+  color: var(--snow, #ffffff);
+}
+
+.gallery-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-hero-swap.pixel-swap,
+.gallery-hero-swap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  aspect-ratio: unset;
+  border-radius: 0;
+}
+
+.gallery-hero-swap .pixel-swap__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-hero-swap-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
 }
 
 .gallery-hero-sky {
@@ -4634,16 +4731,16 @@ section {
   pointer-events: none;
   background:
     linear-gradient(180deg,
-      color-mix(in srgb, #083a75 18%, transparent) 0%,
-      transparent 28%,
+      color-mix(in srgb, #083a75 42%, transparent) 0%,
+      color-mix(in srgb, #083a75 12%, transparent) 35%,
       transparent 55%,
-      color-mix(in srgb, white 55%, transparent) 78%,
-      var(--snow, #ffffff) 100%),
+      color-mix(in srgb, #083a75 55%, transparent) 82%,
+      color-mix(in srgb, #083a75 78%, transparent) 100%),
     linear-gradient(90deg,
-      color-mix(in srgb, white 28%, transparent),
-      transparent 35%,
+      color-mix(in srgb, #083a75 35%, transparent),
+      transparent 45%,
       transparent 70%,
-      color-mix(in srgb, #083a75 10%, transparent));
+      color-mix(in srgb, #083a75 20%, transparent));
 }
 
 @keyframes gallery-sun-breathe {
@@ -4666,15 +4763,15 @@ section {
 .gallery-hero-copy {
   position: relative;
   z-index: 2;
-  padding: 0 6vw 0.15rem;
+  padding: 0 6vw;
   max-width: 42rem;
 }
 
 .gallery-hero-copy .kicker,
 .gallery-hero-copy .display-xl,
 .gallery-hero-copy .serif-lead {
-  color: var(--ink, #083a75);
-  text-shadow: 0 1px 0 color-mix(in srgb, white 55%, transparent);
+  color: var(--snow, #ffffff);
+  text-shadow: 0 8px 28px color-mix(in srgb, #083a75 55%, transparent);
 }
 
 .gallery-hero-copy .display-xl {
@@ -4685,31 +4782,11 @@ section {
   margin-bottom: 0;
   max-width: 34rem;
   font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  color: color-mix(in srgb, var(--snow) 90%, transparent);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.gallery-hero-reel {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  min-height: 0;
-  height: 100%;
-  padding: 0 0 0.4rem;
-  overflow: hidden;
-}
-
-.gallery-hero-reel .flex-carousel {
-  width: 100%;
-  height: 100%;
-  color: var(--ink, #083a75);
-}
-
-.gallery-hero-reel .flex-carousel__caption {
-  color: var(--ink, #083a75);
-  text-shadow: 0 1px 0 color-mix(in srgb, white 50%, transparent);
 }
 
 .lightbox {

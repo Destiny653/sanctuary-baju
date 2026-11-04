@@ -3,6 +3,7 @@ const M = "/assets/mysteries";
 const S = "/assets/stations-cross";
 const I = "/assets/imgs";
 const MT = "/assets/mountains";
+const GH = "/assets/gal-hero";
 
 export const art = {
   angels: `${I}/angels-af.png`,
@@ -23,6 +24,13 @@ export const art = {
   mountaintopOfMary: `${MT}/mountaintopofMary.jpg`,
   /** Default “mountains” collage reference — Jesus mount for twin-mountain contexts. */
   mountains: `${MT}/mountofJesus.png`,
+  /** Gallery page hero — PixelSwap cycle. */
+  galleryHero: [
+    `${GH}/image_24dc5d7f.jpg`,
+    `${GH}/image_46f99653.jpg`,
+    `${GH}/image_5799fa75.jpg`,
+    `${GH}/image_e6641e8b.jpg`,
+  ] as const,
   passionAgony: `${M}/11_Agony_in_the_Garden.png`,
   passionThorns: `${M}/13_Crowning_with_Thorns.png`,
   passionWay: `${S}/Station_02.png`,
