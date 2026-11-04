@@ -9,7 +9,7 @@ import { FilmNarration } from "./motion";
 import { annunciationNarration } from "./film-narration";
 import { useI18n } from "@/i18n";
 
-const SCROLL_MP4 = "/assets/vids/static-scroll.mp4";
+const SCROLL_MP4 = "/assets/vids/static-scroll-scrub.mp4";
 const SCROLL_WEBM = "/assets/vids/static-scroll.webm";
 const SCROLL_POSTER = "/assets/vids/static-scroll-poster.jpg";
 
@@ -158,10 +158,10 @@ export function ScrollVideo() {
           controls={reduced}
           aria-label="Mary praying in a sunlit courtyard"
         >
-          <source src={`${SCROLL_WEBM}?v=2`} type='video/webm; codecs="vp9"' />
+          <source src={`${SCROLL_WEBM}?v=3`} type='video/webm; codecs="vp9"' />
           {/* Last source: if this errors, every source has failed. */}
           <source
-            src={`${SCROLL_MP4}?v=2`}
+            src={`${SCROLL_MP4}?v=3`}
             type='video/mp4; codecs="avc1.42E01E"'
             onError={() => setFailed(true)}
           />
