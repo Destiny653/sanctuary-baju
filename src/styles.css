@@ -3686,64 +3686,40 @@ section {
 
 @media (max-width: 760px) {
   /*
-   * Kill GSAP pin geometry on phones (spacer height / fixed transforms are set inline).
-   * Without this, a hollow pin-spacer scrolls for thousands of px and the blue sky shows.
-   * Stations stay in a horizontal swipe row.
+   * Keep GSAP pin + vertical→horizontal scrub on phones.
+   * Only tighten card/intro sizing — do not collapse pin-spacers or force overflow-x swipe.
    */
   .pin-spacer:has(> #passion),
   .pin-spacer:has(> .passion-pin),
   .passion-pin-spacer {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
     background: var(--snow) !important;
     background-color: var(--snow) !important;
   }
 
-  .pin-spacer:has(> #passion) > .passion-pin,
-  .pin-spacer:has(> .passion-pin) > .passion-pin,
   .passion-pin,
   .passion-pin--native {
-    position: relative !important;
-    inset: auto !important;
-    translate: none !important;
-    transform: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    height: auto !important;
-    max-height: none !important;
-    margin: 0 !important;
-    overflow: visible !important;
+    min-height: 100svh;
+    height: 100svh;
+    overflow: hidden;
     background: var(--snow) !important;
   }
 
   .passion-pin .passion-track,
-  .passion-pin--native .passion-track,
-  .pin-spacer:has(> #passion) .passion-track {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    height: auto !important;
+  .passion-pin--native .passion-track {
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
     gap: 1rem;
     padding: 4.5rem 1.15rem 3.5rem;
+    min-height: 100svh;
+    height: 100svh;
+    width: max-content;
+    max-width: none;
+    overflow: visible;
     background: var(--snow) !important;
-    transform: none !important;
-    translate: none !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
   }
 
   .passion-intro {
     width: min(16.5rem, 78vw);
-    scroll-snap-align: start;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -3760,7 +3736,6 @@ section {
 
   .passion-card {
     width: clamp(12.75rem, 72vw, 17.5rem);
-    scroll-snap-align: center;
   }
 
   .passion-card:nth-child(even) {

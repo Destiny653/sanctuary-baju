@@ -12,8 +12,8 @@ function prefersReduced() {
 }
 
 /**
- * Desktop: pinned horizontal scrub.
- * Mobile: native horizontal swipe — GSAP pin-spacers were flashing the blue sky backdrop.
+ * Pinned horizontal scrub on all viewports (desktop + mobile).
+ * Vertical page scroll drives the track sideways while the section stays pinned.
  */
 export function useHorizontalPin(
   section: RefObject<HTMLElement | null>,
@@ -25,7 +25,6 @@ export function useHorizontalPin(
     const t = track.current;
     if (!s || !t || prefersReduced()) return;
 
-    const mobile = window.matchMedia("(max-width: 760px)");
     let ctx: gsap.Context | null = null;
     let softRefresh: number | undefined;
     let resizeTimer: number | undefined;
@@ -70,12 +69,6 @@ export function useHorizontalPin(
 
     const init = () => {
       kill();
-
-      if (mobile.matches) {
-        s.classList.add("passion-pin--native");
-        return;
-      }
-
       if (distance() < 24) return;
 
       ctx = gsap.context(() => {
@@ -85,12 +78,13 @@ export function useHorizontalPin(
           scrollTrigger: {
             trigger: s,
             start: "top top",
-            end: () => `+=${distance()}`,
+            end: () => `+=${Math.max(distance(), window.innerHeight)}`,
             pin: true,
             scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             pinSpacing: true,
+            // transform pin stays in sync with Lenis (window scroller).
             pinType: "transform",
             onRefresh: (self) => paintSpacer(self),
             onToggle: (self) => paintSpacer(self),
@@ -128,11 +122,9 @@ export function useHorizontalPin(
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => init(), 160);
     };
-    mobile.addEventListener("change", onResize);
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
     return () => {
-      mobile.removeEventListener("change", onResize);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", onResize);
       if (softRefresh) window.clearTimeout(softRefresh);

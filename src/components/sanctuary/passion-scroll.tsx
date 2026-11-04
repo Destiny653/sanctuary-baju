@@ -22,7 +22,7 @@ const STATION_FILES = [
 
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV"];
 
-/** Calvary stations — pinned scrub on desktop, native horizontal swipe on mobile. */
+/** Calvary stations — pinned vertical→horizontal scrub on desktop and mobile. */
 export function PassionScroll() {
   const { t } = useI18n();
   const section = useRef<HTMLElement>(null);

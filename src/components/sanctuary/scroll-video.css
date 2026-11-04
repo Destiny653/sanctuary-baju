@@ -60,8 +60,8 @@
   will-change: transform;
 }
 
-/* GSAP pin-spacer: keeps the page color behind the pinned section */
-.passion-pin-spacer {
+/* Film pin-spacer only — passion spacer is painted in use-horizontal-pin / styles.css */
+.pin-spacer:has(> .scroll-film) {
   background: #f7f9fc !important;
 }
 
