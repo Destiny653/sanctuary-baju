@@ -288,13 +288,30 @@ function PixelSwap({
     let path = '';
 
     for (let i = 0; i < grid.count; i++) {
-      if (now >= flipAt[i] && target[i] !== engine.desired) {
-        target[i] = engine.desired;
-        if (target[i] === 1 && value[i] < pop) value[i] = pop;
+      const flipTime = flipAt[i];
+      const pixelTarget = target[i];
+      let pixelValue = value[i];
+      const pixelVelocity = velocity[i];
+      const pixelX = grid.cx[i];
+      const pixelY = grid.cy[i];
+      if (
+        flipTime === undefined ||
+        pixelTarget === undefined ||
+        pixelValue === undefined ||
+        pixelVelocity === undefined ||
+        pixelX === undefined ||
+        pixelY === undefined
+      ) {
+        throw new RangeError(`Pixel index ${i} is outside the animation buffers`);
       }
-      let x = value[i];
-      let v = velocity[i];
-      const goal = target[i];
+      let goal = pixelTarget;
+      if (now >= flipTime && goal !== engine.desired) {
+        goal = engine.desired;
+        target[i] = goal;
+        if (goal === 1 && pixelValue < pop) pixelValue = pop;
+      }
+      let x = pixelValue;
+      let v = pixelVelocity;
       for (let n = 0; n < steps; n++) {
         v += (-omega * omega * (x - goal) - 2 * zeta * omega * v) * dt;
         x += v * dt;
@@ -303,7 +320,7 @@ function PixelSwap({
         x = 0;
         v = 0;
       }
-      if (Math.abs(x - goal) > 0.001 || Math.abs(v) > 0.01 || now < flipAt[i]) moving = true;
+      if (Math.abs(x - goal) > 0.001 || Math.abs(v) > 0.01 || now < flipTime) moving = true;
       else {
         x = goal;
         v = 0;
@@ -313,7 +330,7 @@ function PixelSwap({
       if (x <= 0.002) continue;
       const size = Math.min(x * 1.08, 1.25) * (half + cover * smoothstep(0.6, 0.93, x));
       const radius = Math.min(size, (s.pixelRadius / 50) * size * (1 - smoothstep(0.6, 0.93, x)));
-      path += pixelPath(grid.cx[i], grid.cy[i], size, radius, s.pixelSpin * (1 - x));
+      path += pixelPath(pixelX, pixelY, size, radius, s.pixelSpin * (1 - x));
     }
 
     const layer = engine.mode === 'intro' ? 0 : 1;
@@ -355,12 +372,22 @@ function PixelSwap({
     const orders = new Float32Array(grid.count);
     let first = Infinity;
     for (let i = 0; i < grid.count; i++) {
-      orders[i] = orderOf(grid, i, s.pattern, point) * (1 - s.randomness) + hash(i) * s.randomness;
-      const settled = engine.target[i] === engine.desired && Math.abs(engine.value[i] - engine.desired) < 0.001;
-      if (!settled) first = Math.min(first, orders[i]);
+      const order = orderOf(grid, i, s.pattern, point) * (1 - s.randomness) + hash(i) * s.randomness;
+      const pixelTarget = engine.target[i];
+      const pixelValue = engine.value[i];
+      if (pixelTarget === undefined || pixelValue === undefined) {
+        throw new RangeError(`Pixel index ${i} is outside the animation buffers`);
+      }
+      orders[i] = order;
+      const settled = pixelTarget === engine.desired && Math.abs(pixelValue - engine.desired) < 0.001;
+      if (!settled) first = Math.min(first, order);
     }
     if (first === Infinity) first = 0;
-    for (let i = 0; i < grid.count; i++) engine.flipAt[i] = now + Math.max(0, orders[i] - first) * s.duration;
+    for (let i = 0; i < grid.count; i++) {
+      const order = orders[i];
+      if (order === undefined) throw new RangeError(`Pixel index ${i} is outside the animation buffers`);
+      engine.flipAt[i] = now + Math.max(0, order - first) * s.duration;
+    }
     root.setAttribute('data-swapping', '');
     if (mode === 'swap') setLayer(0, true, '');
     cancelAnimationFrame(engine.raf);
@@ -396,7 +423,7 @@ function PixelSwap({
     if (!intro || shownRef.current) return;
     const images = [...(layerRefs.current[0]?.querySelectorAll('img') ?? [])].filter(image => !image.complete);
     let started = false;
-    let timer = 0;
+    let timer: ReturnType<typeof setTimeout>;
     const begin = () => {
       if (started) return;
       started = true;

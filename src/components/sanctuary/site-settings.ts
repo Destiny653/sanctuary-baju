@@ -60,7 +60,7 @@ export function writeLocalDisplayFont(id: DisplayFontId) {
 
 export function applyDisplayFont(id: DisplayFontId) {
   if (typeof document === "undefined") return;
-  document.documentElement.dataset.displayFont = id;
+  document.documentElement.dataset["displayFont"] = id;
   writeLocalDisplayFont(id);
 }
 
