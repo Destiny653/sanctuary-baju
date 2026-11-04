@@ -8,17 +8,50 @@
  * Design system: Sanctuary of Our Lady of Mercy.
  * Conversly blues across the house. Text is deep navy (#083A75), never black.
  * Gold is used for one thing only: the ring turning around the Virgin's head.
- * Type: Rumela Smart (Productype) — local webfonts in /fonts/rumela-smart (offline-safe).
- * Glass panels (header, cards, hero veil, film frame) stay frosted so the sky shows through.
- * Sanctuary tokens (--ink, --snow, --sky ...) drive the site CSS below;
- * shadcn tokens (--background, --primary, ...) are mapped onto the same palette.
+ * Display headers: Talesha (serif) — drop licensed webfonts in /fonts/talesha.
+ * Body / UI: Rumela Smart when present, else system sans.
+ * Glass panels stay frosted so the sky shows through.
  */
 
 /*
- * Rumela Smart — only declare @font-face when files exist under
- * /public/fonts/rumela-smart/ (otherwise the browser 404s every weight).
- * Expected names: RumelaSmart-Regular|Medium|SemiBold|Bold|ExtraBold .woff2/.woff
- * Until then: local install if present, else Helvetica Neue / system stack.
+ * Talesha — headers only. Uses local() so missing webfonts do not 404.
+ * Drop licensed files into /public/fonts/talesha/ and prepend url() sources
+ * (see that folder's README). Until then: Cormorant Garamond via --font-display-fallback.
+ */
+@font-face {
+  font-family: "Talesha";
+  src: local("Talesha"), local("Talesha Regular");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Talesha";
+  src: local("Talesha Medium"), local("Talesha-Medium");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Talesha";
+  src: local("Talesha SemiBold"), local("Talesha-SemiBold");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Talesha";
+  src: local("Talesha Bold"), local("Talesha-Bold");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Rumela Smart — body/UI. Only resolves when files exist or the font is installed.
  */
 @font-face {
   font-family: "Rumela Smart";
@@ -105,8 +138,8 @@
 
 :root {
   --sans: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --display: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --serif: "Rumela Smart", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --display: "Talesha", var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --serif: "Talesha", var(--font-display-fallback), "Cormorant Garamond", Georgia, "Times New Roman", serif;
 
   /* Conversly blues — deep → light */
   --ink: #083a75;
@@ -399,13 +432,12 @@ html.fx [data-reveal].is-in {
   margin: 0;
   white-space: nowrap;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  line-height: 0.8;
-  font-size: clamp(6rem, 22vw, 20rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.85;
+  font-size: clamp(3.5rem, 12vw, 9rem);
   color: transparent;
-  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--sky) 70%, transparent);
+  -webkit-text-stroke: 1.25px color-mix(in oklab, var(--sky) 70%, transparent);
   translate: calc((0.5 - var(--p, 0.5)) * 40vw) 0;
   pointer-events: none;
   user-select: none;
@@ -450,10 +482,10 @@ html.fx [data-reveal].is-in {
 
 .kicker {
   margin: 0 0 0.8rem;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.22em;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue);
 }
@@ -468,10 +500,9 @@ html.fx [data-reveal].is-in {
 .split-title {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
   max-width: 100%;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -479,7 +510,7 @@ html.fx [data-reveal].is-in {
 }
 
 .display-lg {
-  font-size: clamp(2.1rem, 4.8vw, 4.1rem);
+  font-size: clamp(1.75rem, 3.4vw, 2.85rem);
   color: var(--ink);
 }
 
@@ -530,10 +561,10 @@ html.fx [data-reveal].is-in {
   border-radius: 6px;
   background: var(--blue);
   color: var(--snow);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-weight: 700;
   font-size: 0.8rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
   box-shadow: 0 12px 30px -12px color-mix(in srgb, #1f63bf 65%, transparent);
@@ -748,10 +779,9 @@ html.fx [data-reveal].is-in {
   color: inherit;
   text-decoration: none;
   font-family: var(--display);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-size: 1.05rem;
 }
 
 .mark {
@@ -854,6 +884,13 @@ html.fx [data-reveal].is-in {
   background: var(--ink);
 }
 
+.hero-mountains {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
 .hero-cinematic {
   position: absolute;
   inset: 0;
@@ -862,6 +899,22 @@ html.fx [data-reveal].is-in {
   height: 100%;
   object-fit: cover;
   object-position: center 40%;
+}
+
+.hero-cinematic-base {
+  z-index: 0;
+}
+
+.hero-cinematic-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-cinematic-fade .hero-cinematic {
+  z-index: 1;
 }
 
 .hero-cinematic-wash {
@@ -1055,7 +1108,7 @@ html.fx [data-reveal].is-in {
   top: 18%;
   text-align: center;
   color: var(--snow);
-  font-size: clamp(2.4rem, 9vw, 6.5rem);
+  font-size: clamp(2rem, 6vw, 4rem);
   text-shadow: 0 14px 50px oklch(0.58 0.14 238 / 0.45);
   pointer-events: none;
 }
@@ -1066,7 +1119,7 @@ html.fx [data-reveal].is-in {
   text-align: left;
   color: var(--ink);
   text-shadow: none;
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-size: clamp(1.85rem, 4vw, 3.1rem);
 }
 
 /* Mary figure: wrapper box keeps the 2:3 ratio of the cut-out so the ring follows her head. */
@@ -1200,7 +1253,7 @@ html.fx [data-reveal].is-in {
   grid-template-columns: 1fr 1fr;
   align-items: center;
   pointer-events: none;
-  font-size: clamp(2rem, 5.2vw, 4.4rem);
+  font-size: clamp(1.7rem, 4vw, 3rem);
 }
 
 .split-title span:first-child {
@@ -1472,12 +1525,209 @@ html.fx [data-reveal].is-in {
   }
 }
 
-/* ---------- About ---------- */
+/* ---------- About (legacy homepage block) ---------- */
 
 .about {
   overflow: hidden;
   background: transparent;
   color: var(--ink);
+}
+
+/* ---------- About page — mission, purpose, founders, blessing ---------- */
+
+.about-mission,
+.about-purpose,
+.about-founders,
+.about-blessing,
+.about-hours-band {
+  position: relative;
+  overflow: hidden;
+  color: var(--ink);
+}
+
+.about-mission-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: end;
+}
+
+.about-mission-quote {
+  margin-top: 2rem;
+}
+
+.about-mission-figure {
+  margin: 0;
+}
+
+.about-mission-figure img {
+  display: block;
+  width: 100%;
+  height: min(34rem, 70vh);
+  object-fit: cover;
+  object-position: center 35%;
+}
+
+.about-mission-figure figcaption {
+  margin-top: 0.55rem;
+  padding: 0 0.4rem 0.2rem;
+  font-family: var(--display);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+
+.about-purpose-intro,
+.about-founders-intro {
+  max-width: 42rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.about-purpose-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.about-purpose-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.5rem 1.4rem 1.6rem;
+  align-content: start;
+}
+
+.about-purpose-index {
+  font-family: var(--display);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  color: var(--blue);
+}
+
+.about-founders-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.about-founder-card {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  align-items: stretch;
+}
+
+.about-founder-photo {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: oklch(0.92 0.02 242);
+  display: grid;
+  place-items: center;
+}
+
+.about-founder-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-founder-initial,
+.about-blessing-placeholder span {
+  font-family: var(--display);
+  font-size: 3rem;
+  color: var(--blue);
+  letter-spacing: 0.08em;
+}
+
+.about-founder-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.about-blessing-panel {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: center;
+}
+
+.about-blessing-name {
+  margin: 0.35rem 0 0;
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.about-blessing-role {
+  margin-top: 0.35rem;
+}
+
+.about-blessing-date {
+  margin: 0.2rem 0 1.1rem;
+  font-family: var(--display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--quiet);
+}
+
+.about-blessing-portrait {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 0.4rem;
+  background: oklch(0.94 0.02 242);
+}
+
+.about-blessing-portrait img,
+.about-blessing-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-blessing-placeholder {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 20%, oklch(1 0 0 / 0.55), transparent 45%),
+    linear-gradient(160deg, oklch(0.9 0.04 242), oklch(0.82 0.06 242));
+}
+
+.about-hours-band .hours {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .about-mission-grid,
+  .about-blessing-panel,
+  .about-founder-card {
+    grid-template-columns: 1fr;
+  }
+
+  .about-purpose-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-mission-figure img {
+    height: 22rem;
+  }
+
+  .about-founder-photo,
+  .about-blessing-portrait {
+    max-width: 18rem;
+  }
 }
 
 .about-grid,
@@ -1581,14 +1831,13 @@ html.fx [data-reveal].is-in {
   overflow: hidden;
   pointer-events: none;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.04em;
-  line-height: 0.8;
-  font-size: clamp(4.5rem, 18vw, 16rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  font-size: clamp(3rem, 11vw, 8rem);
   color: color-mix(in srgb, var(--ink) 55%, white);
   text-shadow: 0 16px 60px color-mix(in srgb, #1f63bf 28%, transparent);
-  transform: scale(calc(0.42 + var(--p, 0.5) * 0.78));
+  transform: scale(calc(0.55 + var(--p, 0.5) * 0.55));
   filter: blur(calc((1 - min(1, var(--p, 0.5) * 2.4)) * 14px));
   opacity: calc(0.15 + var(--p, 0.5) * 1.35);
   max-width: 100%;
@@ -1831,11 +2080,11 @@ html.fx [data-reveal].is-in {
   }
 
   .display-xl {
-    font-size: clamp(1.75rem, 8.8vw, 2.55rem);
+    font-size: clamp(1.55rem, 7vw, 2.15rem);
   }
 
   .display-lg {
-    font-size: clamp(1.55rem, 7.5vw, 2.25rem);
+    font-size: clamp(1.4rem, 6.2vw, 1.95rem);
   }
 
   .serif-lead {
@@ -1869,8 +2118,8 @@ html.fx [data-reveal].is-in {
     text-align: right;
     padding-right: 0.5rem;
     box-sizing: border-box;
-    font-size: clamp(2.6rem, 18vw, 4.2rem);
-    -webkit-text-stroke-width: 1.5px;
+    font-size: clamp(2rem, 12vw, 3.1rem);
+    -webkit-text-stroke-width: 1.25px;
   }
 
   .evangel-card h3 {
@@ -2137,8 +2386,8 @@ html.fx [data-reveal].is-in {
 
 .descent-copy .display-lg {
   color: var(--ink);
-  font-size: clamp(1.85rem, 4.2vw, 3.4rem);
-  line-height: 0.95;
+  font-size: clamp(1.55rem, 3.2vw, 2.55rem);
+  line-height: 1.08;
 }
 
 .descent-copy .body-copy {
@@ -3058,15 +3307,14 @@ html.fx [data-reveal].is-in {
 .book-block h3,
 .menu-links a {
   font-family: var(--display);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  line-height: 0.9;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 .sheet-title {
   margin: 0;
-  font-size: 3rem;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
 }
 
 .search-input {
@@ -3077,10 +3325,9 @@ html.fx [data-reveal].is-in {
   background: transparent;
   color: var(--ink);
   font-family: var(--display);
-  font-weight: 800;
-  font-size: clamp(2.4rem, 6vw, 4.6rem);
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  letter-spacing: -0.02em;
   padding: 0.2rem 0 0.4rem;
   border-radius: 0;
 }
@@ -3166,7 +3413,7 @@ html.fx [data-reveal].is-in {
 .menu-links a {
   color: var(--ink);
   text-decoration: none;
-  font-size: clamp(2.1rem, 8vw, 3.6rem);
+  font-size: clamp(1.65rem, 5.5vw, 2.45rem);
 }
 
 .menu-links a:hover {
@@ -3233,7 +3480,7 @@ html.fx [data-reveal].is-in {
 
   .hero-title {
     top: 18%;
-    font-size: clamp(2.5rem, 13.2vw, 4.4rem);
+    font-size: clamp(1.85rem, 9vw, 2.85rem);
     white-space: nowrap;
   }
 
@@ -3253,7 +3500,7 @@ html.fx [data-reveal].is-in {
   .split-title {
     align-items: start;
     padding-top: 18vh;
-    font-size: clamp(2rem, 9vw, 3.1rem);
+    font-size: clamp(1.65rem, 7vw, 2.35rem);
   }
 
   .shard:nth-child(n + 7) {
@@ -3357,11 +3604,10 @@ html.lenis body {
 .display-xl {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
-  font-size: clamp(2.35rem, 5.6vw, 5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-size: clamp(1.9rem, 4vw, 3.25rem);
   color: var(--ink);
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -3372,9 +3618,8 @@ html.lenis body {
 .display-md {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
   color: var(--ink);
 }
 
@@ -3457,8 +3702,8 @@ section {
   left: 0.6rem;
   top: 0.4rem;
   font-family: var(--display);
-  font-weight: 800;
-  font-size: 2.4rem;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
   color: var(--snow);
   text-shadow: 0 2px 16px var(--ink);
 }
@@ -3540,7 +3785,7 @@ section {
 }
 
 .hero-title.is-mosaic {
-  font-size: clamp(2.2rem, 5.5vw, 4.6rem);
+  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
   color: var(--ink);
   text-shadow: 0 0 40px var(--snow), 0 0 80px var(--snow);
 }
@@ -3698,17 +3943,17 @@ section {
 .passion-card-cap span {
   display: block;
   font-family: var(--display);
-  font-size: 2.2rem;
-  font-weight: 800;
-  line-height: 1;
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.05;
 }
 
 .passion-card-cap h3 {
   margin: 0.3rem 0 0;
-  font-family: var(--display);
+  font-family: var(--sans);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 1rem;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
   line-height: 1.25;
 }
 
@@ -3755,7 +4000,7 @@ section {
   }
 
   .passion-intro .display-xl {
-    font-size: clamp(1.7rem, 8.5vw, 2.35rem);
+    font-size: clamp(1.5rem, 7vw, 2rem);
   }
 
   .passion-intro .serif-lead {
@@ -3841,9 +4086,8 @@ section {
 
 .marquee-item {
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: clamp(1.8rem, 4.2vw, 3.4rem);
+  font-weight: 600;
+  font-size: clamp(1.45rem, 3vw, 2.35rem);
   padding-right: 2rem;
 }
 
@@ -3864,12 +4108,11 @@ section {
   right: -2rem;
   top: 2rem;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: clamp(4.5rem, 14vw, 12rem);
+  font-weight: 600;
+  font-size: clamp(3rem, 10vw, 7rem);
   color: transparent;
-  -webkit-text-stroke: 2px var(--sky);
-  opacity: 0.6;
+  -webkit-text-stroke: 1.5px var(--sky);
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -4172,11 +4415,10 @@ section {
 .page-title {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  font-size: clamp(2.4rem, 6vw, 5.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.9rem, 4.2vw, 3.25rem);
   color: var(--ink);
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -4234,14 +4476,13 @@ section {
   left: -1rem;
   bottom: -2rem;
   font-family: var(--display);
-  font-weight: 800;
-  text-transform: uppercase;
-  font-size: clamp(6rem, 20vw, 18rem);
-  line-height: 0.8;
+  font-weight: 600;
+  font-size: clamp(3.5rem, 12vw, 9rem);
+  line-height: 0.85;
   white-space: nowrap;
   color: transparent;
-  -webkit-text-stroke: 2px var(--sky);
-  opacity: 0.5;
+  -webkit-text-stroke: 1.5px var(--sky);
+  opacity: 0.45;
   pointer-events: none;
 }
 
@@ -4279,8 +4520,8 @@ section {
 
 .album-n {
   font-family: var(--display);
-  font-weight: 800;
-  font-size: 4rem;
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2.75rem);
   color: var(--sky);
   line-height: 1;
 }
@@ -4766,19 +5007,71 @@ section {
   }
 }
 
-/* Locations extras */
-.mountains {
+/* Locations extras + twin mountain cards */
+.mountains,
+.twin-mountains {
   position: relative;
   display: grid;
   gap: 2rem;
 }
 
+.mountains-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.mountains-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+
+a.mountains-card:hover {
+  transform: translateY(-2px);
+}
+
 .mountains-img {
   width: 100%;
-  max-height: 80vh;
+  aspect-ratio: 16 / 9;
+  max-height: none;
   object-fit: cover;
   border-radius: 6px;
-  border: 3px solid var(--snow);
+  border: 2px solid oklch(1 0 0 / 0.55);
+}
+
+.mountains-summit {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid oklch(1 0 0 / 0.35);
+  opacity: 0.96;
+}
+
+.mountains-card-copy {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.35rem 0.25rem 0.55rem;
+  color: var(--ink);
+}
+
+.mountains-card-copy h3,
+.contact-cards h3 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  margin: 0.15rem 0;
+}
+
+.mountains-card-copy p,
+.contact-cards p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--slate);
 }
 
 .mountains-cols {
@@ -4795,19 +5088,40 @@ section {
   color: var(--ink);
 }
 
-.mountains-cols h3,
-.contact-cards h3 {
+.mountains-cols h3 {
   font-family: var(--display);
   text-transform: uppercase;
   font-size: 1.8rem;
   margin: 0.4rem 0;
 }
 
-.mountains-cols p,
-.contact-cards p {
+.mountains-cols p {
   margin: 0;
   font-size: 1.2rem;
   color: var(--slate);
+}
+
+.passion-summit {
+  margin: 1.25rem 0 0;
+  max-width: 22rem;
+}
+
+.passion-summit img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 2px solid oklch(1 0 0 / 0.5);
+}
+
+.passion-summit figcaption {
+  margin-top: 0.45rem;
+  font-family: var(--display);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--quiet);
 }
 
 .hours-row {
@@ -4849,8 +5163,13 @@ section {
 @media (max-width: 760px) {
 
   .mountains-cols,
+  .mountains-pair,
   .contact-cards {
     grid-template-columns: 1fr;
+  }
+
+  .passion-summit {
+    max-width: none;
   }
 }
 

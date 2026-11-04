@@ -55,7 +55,7 @@ export function Welcome() {
           </a>
         </div>
         <figure className="welcome-figure" data-reveal>
-          <img src={art.northGarden} alt="" loading="lazy" />
+          <img src={art.mountOfMary} alt={t.mountains.femaleTitle} loading="lazy" />
         </figure>
       </div>
     </section>

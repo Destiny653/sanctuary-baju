@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  BookOpen,
   CalendarDays,
   ExternalLink,
   Images,
@@ -80,6 +81,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     { to: "/dashboard/life", label: t.dash.life, icon: Sparkles },
     { to: "/dashboard/gallery", label: t.dash.gallery, icon: Images },
     { to: "/dashboard/leadership", label: t.dash.leadership, icon: Users },
+    { to: "/dashboard/about", label: t.dash.about, icon: BookOpen },
     { to: "/dashboard/messages", label: t.dash.messages, icon: Mail },
     { to: "/dashboard/settings", label: t.dash.settings, icon: MapPinned },
   ];

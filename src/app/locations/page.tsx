@@ -17,24 +17,35 @@ export default function LocationsPage() {
             kicker={t.locations.kicker}
             title={t.locations.title}
             lede={t.locations.lead}
-            images={[art.sanctuary, art.mountains, art.hills, art.heaven]}
+            images={[art.mountOfMary, art.mountOfJesus, art.mountaintopOfMary, art.mountaintopOfJesus]}
           />
           <Locations />
           <LocationMap />
           <section className="mountains band band-sky">
-            <img className="mountains-img" src={art.mountains} alt={t.mountains.imageAlt} loading="lazy" data-gsap="zoom" />
             <div className="mountains-copy">
+              <p className="kicker">{t.mountains.kicker}</p>
               <SplitText text={t.mountains.title} className="display-xl" />
-              <div className="mountains-cols">
-                <div className="glass" data-gsap="left">
+              <p className="serif-lead">{t.mountains.lead}</p>
+            </div>
+            <div className="mountains-pair">
+              <figure className="mountains-card glass" data-gsap="left">
+                <img className="mountains-img" src={art.mountOfMary} alt={t.mountains.femaleTitle} loading="lazy" />
+                <img className="mountains-summit" src={art.mountaintopOfMary} alt={t.mountains.summitMaryAlt} loading="lazy" />
+                <div className="mountains-card-copy">
+                  <p className="kicker">{t.mountains.femaleKicker}</p>
                   <h3>{t.mountains.femaleTitle}</h3>
                   <p>{t.mountains.femaleText}</p>
                 </div>
-                <div className="glass" data-gsap="right">
+              </figure>
+              <figure className="mountains-card glass" data-gsap="right">
+                <img className="mountains-img" src={art.mountOfJesus} alt={t.mountains.maleTitle} loading="lazy" />
+                <img className="mountains-summit" src={art.mountaintopOfJesus} alt={t.mountains.summitJesusAlt} loading="lazy" />
+                <div className="mountains-card-copy">
+                  <p className="kicker">{t.mountains.maleKicker}</p>
                   <h3>{t.mountains.maleTitle}</h3>
                   <p>{t.mountains.maleText}</p>
                 </div>
-              </div>
+              </figure>
             </div>
           </section>
           <section className="hours-band band band-snow">

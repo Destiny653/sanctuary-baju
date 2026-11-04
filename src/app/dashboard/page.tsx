@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Images, Mail, Newspaper, Sparkles, Users } from "lucide-react";
+import { BookOpen, CalendarDays, Images, Mail, Newspaper, Sparkles, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -38,6 +38,7 @@ export default function Overview() {
     { to: "/dashboard/life", label: t.dash.life, n: data?.life, icon: Sparkles },
     { to: "/dashboard/gallery", label: t.dash.gallery, n: data?.gallery, icon: Images },
     { to: "/dashboard/leadership", label: t.dash.leadership, n: data?.leaders, icon: Users },
+    { to: "/dashboard/about", label: t.dash.about, icon: BookOpen },
     { to: "/dashboard/messages", label: t.dash.messages, n: data?.messages, icon: Mail },
   ];
   return (

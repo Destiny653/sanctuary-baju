@@ -8,6 +8,7 @@ const UPLOAD_FOLDERS = new Set([
   "posts/life",
   "gallery",
   "leaders",
+  "about",
 ]);
 
 const MAX_BYTES = 200 * 1024 * 1024;

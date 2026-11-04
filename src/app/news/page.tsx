@@ -23,7 +23,7 @@ export default function NewsPage() {
             kicker={t.posts.newsKicker}
             title={t.pages.newsHeroTitle}
             lede={t.pages.newsHeroLead}
-            images={[art.mountains, art.evangelCall, art.sanctuary, art.passionWay]}
+            images={[art.mountOfJesus, art.mountOfMary, art.evangelCall, art.passionWay]}
           />
           <section className="news band band-snow">
             {!first && <p className="empty-note">{t.pages.newsEmpty}</p>}

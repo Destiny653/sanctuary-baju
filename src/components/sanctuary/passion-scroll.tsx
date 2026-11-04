@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { art } from "./art";
 import { Tilt } from "./motion";
 import { useHorizontalPin } from "./use-horizontal-pin";
 import { useI18n } from "@/i18n";
@@ -41,6 +42,10 @@ export function PassionScroll() {
           <p className="kicker">{t.home.passionKicker}</p>
           <h2 className="display-xl">{t.home.passionTitle}</h2>
           <p className="serif-lead">{t.home.passionLead}</p>
+          <figure className="passion-summit">
+            <img src={art.mountaintopOfJesus} alt={t.mountains.maleTitle} loading="lazy" />
+            <figcaption>{t.mountains.maleTitle}</figcaption>
+          </figure>
         </div>
         {stations.map((p) => (
           <Tilt key={p.src} className="passion-card">

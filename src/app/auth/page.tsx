@@ -78,7 +78,7 @@ export default function AuthPage() {
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <img src={art.mountains} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={art.mountOfMary} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/10 to-transparent" />
         <div className="absolute bottom-10 left-10 right-10 text-primary-foreground">
           <p className="font-display text-sm uppercase tracking-[0.3em]">Our Lady of Mercy</p>

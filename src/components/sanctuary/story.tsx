@@ -74,7 +74,7 @@ export function Way() {
   const { t } = useI18n();
   return (
     <section className="way band-snow" id="way" data-scroll>
-      <img className="fill ken way-bg" src={art.northGarden} alt="" loading="lazy" />
+      <img className="fill ken way-bg" src={art.mountOfJesus} alt="" loading="lazy" />
       <div className="way-shade" />
       <Shards />
       <div className="way-copy glass" data-reveal>
@@ -163,7 +163,7 @@ export function Descent() {
 
   return (
     <section className="descent band-sky" id="descent" data-scroll>
-      <img className="fill ken" src={art.heaven} alt="" loading="lazy" />
+      <img className="fill ken" src={art.mountOfMary} alt="" loading="lazy" />
       <div className="rays" aria-hidden="true" />
       <div className="halo" aria-hidden="true" />
       {!mobile ? <Petals /> : null}

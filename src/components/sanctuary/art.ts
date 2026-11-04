@@ -2,6 +2,7 @@
 const M = "/assets/mysteries";
 const S = "/assets/stations-cross";
 const I = "/assets/imgs";
+const MT = "/assets/mountains";
 
 export const art = {
   angels: `${I}/angels-af.png`,
@@ -15,7 +16,13 @@ export const art = {
   mary: `${I}/mary-af.png`,
   sanctuary: `${M}/19_Assumption_of_Mary.png`,
   worship: `${M}/20_Coronation_of_Mary.png`,
-  mountains: `${M}/14_Carrying_of_the_Cross.png`,
+  /** Twin mountains — Mount of Jesus (Calvary) and Mount of Mary. */
+  mountOfJesus: `${MT}/mountofJesus.png`,
+  mountOfMary: `${MT}/mountofMary.png`,
+  mountaintopOfJesus: `${MT}/mountaintopofJesus.png`,
+  mountaintopOfMary: `${MT}/mountaintopofMary.jpg`,
+  /** Default “mountains” collage reference — Jesus mount for twin-mountain contexts. */
+  mountains: `${MT}/mountofJesus.png`,
   passionAgony: `${M}/11_Agony_in_the_Garden.png`,
   passionThorns: `${M}/13_Crowning_with_Thorns.png`,
   passionWay: `${S}/Station_02.png`,
