@@ -1,0 +1,77 @@
+/* ---------- Scroll film section ---------- */
+.scroll-film {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #f7f9fc;
+  isolation: isolate;
+}
+
+.scroll-film-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  background: #f7f9fc;
+}
+
+.scroll-film-media.is-visible {
+  opacity: 1;
+}
+
+/* Soft gradient so narration text stays readable */
+.scroll-film::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(8, 58, 117, 0.45) 0%,
+    rgba(8, 58, 117, 0) 45%
+  );
+}
+
+/* Progress bar */
+.scroll-film-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.scroll-film-progress > div {
+  height: 100%;
+  background: #52a1fe;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* GSAP pin-spacer: keeps the page color behind the pinned section */
+.passion-pin-spacer {
+  background: #f7f9fc !important;
+}
+
+/* Reduced motion: normal video with controls, no pinning */
+.scroll-film.is-reduced .scroll-film-media {
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .scroll-film-progress {
+    height: 2px;
+  }
+}

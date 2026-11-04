@@ -1,5 +1,6 @@
 "use client";
 
+import "./scroll-video.css";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,15 +9,10 @@ import { FilmNarration } from "./motion";
 import { annunciationNarration } from "./film-narration";
 import { useI18n } from "@/i18n";
 
-/** Local public URLs — Lovable `__l5e` asset.json paths do not resolve on Next/Vercel. */
 const SCROLL_MP4 = "/assets/vids/static-scroll.mp4";
 const SCROLL_WEBM = "/assets/vids/static-scroll.webm";
 const SCROLL_POSTER = "/assets/vids/static-scroll-poster.jpg";
 
-/**
- * Silent film whose timeline follows Lenis/ScrollTrigger scroll.
- * WebM first (Chromium), then MP4 (Safari). Pin + scrub — not autoplay.
- */
 export function ScrollVideo() {
   const { lang } = useI18n();
   const narration = annunciationNarration[lang];
@@ -42,6 +38,12 @@ export function ScrollVideo() {
       let desiredTime = 0;
       let unlocked = false;
 
+      video.defaultMuted = true;
+      video.muted = true;
+
+      const clampTime = (t: number) =>
+        Math.min(Math.max(t, 0), Math.max(video.duration - 0.05, 0));
+
       const seek = () => {
         if (disposed || video.seeking || video.readyState < 1) return;
         if (Math.abs(video.currentTime - desiredTime) <= 0.015) return;
@@ -52,14 +54,12 @@ export function ScrollVideo() {
         }
       };
 
-      /** Safari often won't paint seeks until play() has run once. */
+      // Safari won't paint seeks until play() has run once.
       const unlock = async () => {
         if (unlocked || disposed) return;
-        video.muted = true;
         try {
-          const attempt = video.play();
           await Promise.race([
-            attempt.catch(() => undefined),
+            video.play().catch(() => undefined),
             new Promise<void>((r) => window.setTimeout(r, 600)),
           ]);
         } catch {
@@ -67,10 +67,12 @@ export function ScrollVideo() {
         }
         video.pause();
         unlocked = true;
+        seek();
       };
 
       const setup = () => {
-        if (disposed || tween || !Number.isFinite(video.duration) || video.duration <= 0) return;
+        if (disposed || tween) return;
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return;
         video.pause();
         void unlock();
 
@@ -78,9 +80,13 @@ export function ScrollVideo() {
           progress: 1,
           ease: "none",
           onUpdate: () => {
-            desiredTime = videoTimeForProgress(playhead.progress, video.duration);
+            desiredTime = clampTime(
+              videoTimeForProgress(playhead.progress, video.duration)
+            );
             seek();
-            if (progressRef.current) gsap.set(progressRef.current, { scaleX: playhead.progress });
+            if (progressRef.current) {
+              gsap.set(progressRef.current, { scaleX: playhead.progress });
+            }
           },
           scrollTrigger: {
             id: "homepage-scroll-video",
@@ -91,10 +97,8 @@ export function ScrollVideo() {
             scrub: 0.35,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            onRefresh: () => {
-              // Keep pin-spacer snow (avoids sky flash through hollow spacer).
-              const st = ScrollTrigger.getById("homepage-scroll-video");
-              const spacer = (st as ScrollTrigger & { spacer?: HTMLElement } | undefined)?.spacer;
+            onRefresh: (self) => {
+              const spacer = (self as ScrollTrigger & { spacer?: HTMLElement }).spacer;
               spacer?.classList.add("passion-pin-spacer");
             },
           },
@@ -106,9 +110,7 @@ export function ScrollVideo() {
       video.addEventListener("durationchange", setup);
       video.addEventListener("seeked", seek);
       if (video.readyState >= 1) setup();
-      else video.load();
 
-      // Lenis mounts one frame later — refresh once pin exists.
       const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
 
       return () => {
@@ -151,20 +153,23 @@ export function ScrollVideo() {
           preload="auto"
           muted
           playsInline
+          disablePictureInPicture
+          disableRemotePlayback
           controls={reduced}
-          onError={() => {
-            // Only fall back once every <source> has failed.
-            if (videoRef.current?.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-              setFailed(true);
-            }
-          }}
           aria-label="Mary praying in a sunlit courtyard"
         >
-          <source src={`${SCROLL_WEBM}?v=1`} type='video/webm; codecs="vp9"' />
-          <source src={`${SCROLL_MP4}?v=1`} type='video/mp4; codecs="avc1.42E01E"' />
+          <source src={`${SCROLL_WEBM}?v=2`} type='video/webm; codecs="vp9"' />
+          {/* Last source: if this errors, every source has failed. */}
+          <source
+            src={`${SCROLL_MP4}?v=2`}
+            type='video/mp4; codecs="avc1.42E01E"'
+            onError={() => setFailed(true)}
+          />
         </video>
       )}
+
       {!failed && <FilmNarration videoRef={videoRef} {...narration} reduced={reduced} />}
+
       <div className="scroll-film-progress" aria-hidden="true">
         <div ref={progressRef} />
       </div>
