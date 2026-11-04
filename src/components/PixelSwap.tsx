@@ -145,6 +145,11 @@ const buildGrid = (width: number, height: number, pixelSize: number, gap: number
 const orderOf = (grid: Grid, index: number, pattern: string, point: Point | null) => {
   const x = grid.gx[index];
   const y = grid.gy[index];
+  const cx = grid.cx[index];
+  const cy = grid.cy[index];
+  if (x === undefined || y === undefined || cx === undefined || cy === undefined) {
+    throw new RangeError(`Pixel index ${index} is outside the grid`);
+  }
   if (pattern === 'random') return hash(index + 11);
   if (pattern === 'center') return Math.hypot(x - 0.5, y - 0.5) / Math.SQRT1_2;
   if (pattern === 'edges') return 1 - Math.min(x, 1 - x, y, 1 - y) * 2;
@@ -166,7 +171,7 @@ const orderOf = (grid: Grid, index: number, pattern: string, point: Point | null
     Math.hypot(grid.width - px, grid.height - py),
     1
   );
-  return Math.hypot(grid.cx[index] - px, grid.cy[index] - py) / reach;
+  return Math.hypot(cx - px, cy - py) / reach;
 };
 
 const pixelPath = (x: number, y: number, half: number, radius: number, angle: number) => {

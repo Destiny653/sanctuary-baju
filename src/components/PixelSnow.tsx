@@ -31,7 +31,7 @@ export interface PixelSnowProps extends HTMLAttributes<HTMLDivElement> {
 
 type Settings = {
   color: string;
-  variant: number;
+  variant: PixelSnowVariant;
   density: number;
   speed: number;
   wind: number;
@@ -55,9 +55,10 @@ type Settings = {
 type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
 
 type Target = { texture: WebGLTexture | null; framebuffer: WebGLFramebuffer | null; width: number; height: number };
+type FlakeLevel = 0 | 1 | 2 | 3 | 4;
 
 type Flake = {
-  level: number;
+  level: FlakeLevel;
   x: number;
   y: number;
   vx: number;
@@ -71,7 +72,7 @@ type Flake = {
   levelSize: number;
 };
 
-const SPRITES: Record<string, string[][]> = {
+const SPRITES: Record<PixelSnowVariant, string[][]> = {
   square: [
     ['@'],
     ['oo', 'oo'],
@@ -124,14 +125,14 @@ const SPRITES: Record<string, string[][]> = {
   ]
 };
 
-const VARIANTS = ['square', 'round', 'snowflake'];
+const VARIANTS: PixelSnowVariant[] = ['square', 'round', 'snowflake'];
 const CELL = 9;
 const LEVELS = 5;
 const SLOTS = 8;
 const MAX_FLAKES = 4000;
 const LEVEL_WEIGHTS = [0.46, 0.27, 0.15, 0.08, 0.04];
-const LEVEL_FALL = [16, 24, 34, 48, 66];
-const LEVEL_LIGHT = [0.42, 0.58, 0.76, 0.92, 1];
+const LEVEL_FALL = [16, 24, 34, 48, 66] as const;
+const LEVEL_LIGHT = [0.42, 0.58, 0.76, 0.92, 1] as const;
 const INTRO_SECONDS = 1.4;
 
 const QUAD_VERTEX = `#version 300 es
@@ -401,7 +402,7 @@ export default function PixelSnow({
   const wakeRef = useRef<(() => void) | null>(null);
   const settings: Settings = {
     color: String(color),
-    variant: Math.max(0, VARIANTS.indexOf(variant)),
+    variant,
     density: clamp(density, 0, 1),
     speed,
     wind: clamp(wind, -2, 2),
@@ -419,7 +420,7 @@ export default function PixelSnow({
     opacity: clamp(opacity, 0, 1),
     lightMode,
     paused,
-    dpr
+    ...(dpr !== undefined ? { dpr } : {})
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -442,8 +443,17 @@ export default function PixelSnow({
       down: link(gl, QUAD_VERTEX, DOWN, ['aPosition']),
       up: link(gl, QUAD_VERTEX, UP, ['aPosition']),
       composite: link(gl, QUAD_VERTEX, COMPOSITE, ['aPosition'])
-    } as Record<string, Program>;
-    if (Object.values(programs).some(entry => !entry)) return undefined;
+    };
+    if (!programs.flake || !programs.pile || !programs.down || !programs.up || !programs.composite) {
+      return undefined;
+    }
+    const activePrograms = {
+      flake: programs.flake,
+      pile: programs.pile,
+      down: programs.down,
+      up: programs.up,
+      composite: programs.composite
+    };
 
     const atlas = buildAtlas();
     const atlasTexture = gl.createTexture();
@@ -503,6 +513,11 @@ export default function PixelSnow({
     let pileWidth = 0;
     const down = [createTarget(gl.LINEAR), createTarget(gl.LINEAR), createTarget(gl.LINEAR)];
     const up = [createTarget(gl.LINEAR), createTarget(gl.LINEAR)];
+    const getTarget = (targets: Target[], index: number) => {
+      const target = targets[index];
+      if (!target) throw new Error(`Missing render target at index ${index}`);
+      return target;
+    };
 
     const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -516,8 +531,8 @@ export default function PixelSnow({
         probe.fillStyle = '#ffffff';
         probe.fillStyle = value;
         probe.fillRect(0, 0, 1, 1);
-        const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
-        rgb = [r / 255, g / 255, b / 255];
+        const pixel = probe.getImageData(0, 0, 1, 1).data;
+        rgb = [(pixel[0] ?? 255) / 255, (pixel[1] ?? 255) / 255, (pixel[2] ?? 255) / 255];
       }
       colorCache.set(value, rgb);
       return rgb;
@@ -538,11 +553,13 @@ export default function PixelSnow({
       let total = 0;
       const weights = LEVEL_WEIGHTS.map((weight, level) => weight * Math.pow(2.2, shift * (level - 1.5)));
       const sum = weights.reduce((a, b) => a + b, 0);
-      for (let level = 0; level < LEVELS; level++) {
-        total += weights[level] / sum;
+      for (const level of [0, 1, 2, 3, 4] as const) {
+        const weight = weights[level];
+        if (weight === undefined) continue;
+        total += weight / sum;
         if (r <= total) return level;
       }
-      return LEVELS - 1;
+      return 4;
     };
 
     const spawn = (flake: Flake, s: Settings, top: boolean) => {
@@ -607,13 +624,18 @@ export default function PixelSnow({
         if (settle) {
           const column = Math.floor(flake.x / view.pixel);
           if (column >= 0 && column < pile.length) {
-            const surface = view.height - pile[column] * view.pixel;
-            if (flake.y >= surface && pile[column] > 0.5) {
+            const pileHeight = pile[column];
+            const surface = pileHeight === undefined ? view.height : view.height - pileHeight * view.pixel;
+            if (pileHeight !== undefined && flake.y >= surface && pileHeight > 0.5) {
               const reach = level;
               for (let k = -reach; k <= reach; k++) {
                 const index = column + k;
-                if (index >= 0 && index < pile.length)
-                  pile[index] += (0.35 + level * 0.15) * (1 - Math.abs(k) / (reach + 1));
+                if (index >= 0 && index < pile.length) {
+                  const adjacentHeight = pile[index];
+                  if (adjacentHeight !== undefined) {
+                    pile[index] = adjacentHeight + (0.35 + level * 0.15) * (1 - Math.abs(k) / (reach + 1));
+                  }
+                }
               }
               spawn(flake, s, true);
               flake.reveal = -1;
@@ -637,26 +659,33 @@ export default function PixelSnow({
       if (s.accumulate && s.speed > 0) {
         const grow = (0.25 + s.density * 0.9) * dt * Math.min(1, s.speed);
         for (let i = 0; i < pile.length; i++) {
+          const height = pile[i];
+          if (height === undefined) continue;
           const dune = 0.55 + 0.45 * Math.sin(i * 0.045 + Math.sin(i * 0.013) * 2.1) * Math.sin(i * 0.021 + 1.3);
-          if (pile[i] < cap * dune) pile[i] += grow * (0.6 + 0.8 * dune);
+          if (height < cap * dune) pile[i] = height + grow * (0.6 + 0.8 * dune);
         }
       }
       for (let pass = 0; pass < 2; pass++) {
         const forward = pass === 0;
         for (let k = 0; k < pile.length - 1; k++) {
           const i = forward ? k : pile.length - 2 - k;
-          const difference = pile[i] - pile[i + 1];
+          const current = pile[i];
+          const next = pile[i + 1];
+          if (current === undefined || next === undefined) continue;
+          const difference = current - next;
           if (Math.abs(difference) > 1.2) {
             const move = (Math.abs(difference) - 1.2) * 0.5 * Math.sign(difference);
-            pile[i] -= move;
-            pile[i + 1] += move;
+            pile[i] = current - move;
+            pile[i + 1] = next + move;
           }
         }
       }
       for (let i = 0; i < pile.length; i++) {
-        const excess = Math.max(0, pile[i] - cap);
-        const rate = s.accumulate && s.speed > 0 ? excess * 0.8 : 2 + pile[i] * 0.6;
-        pile[i] = Math.max(0, pile[i] - rate * dt);
+        const height = pile[i];
+        if (height === undefined) continue;
+        const excess = Math.max(0, height - cap);
+        const rate = s.accumulate && s.speed > 0 ? excess * 0.8 : 2 + height * 0.6;
+        pile[i] = Math.max(0, height - rate * dt);
       }
     };
 
@@ -670,14 +699,21 @@ export default function PixelSnow({
     const bindTexture = (entry: Program, name: string, unit: number, texture: WebGLTexture | null) => {
       gl.activeTexture(gl.TEXTURE0 + unit);
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.uniform1i(entry.uniforms[name], unit);
+      gl.uniform1i(entry.uniforms[name] ?? null, unit);
     };
+    const getUniform = (entry: Program, name: string) => entry.uniforms[name] ?? null;
 
     const render = () => {
       const s = settingsRef.current;
       sizeTarget(snow, view.gridWidth, view.gridHeight);
       let count = 0;
-      const sizes = SPRITES[VARIANTS[s.variant]].map(rows => rows.length);
+      const sizes = SPRITES[s.variant].map(rows => rows.length);
+      const sizeAt = (level: number) => {
+        const size = sizes[level];
+        if (size === undefined) throw new Error(`Missing sprite size for level ${level}`);
+        return size;
+      };
+      const variantIndex = VARIANTS.indexOf(s.variant);
       const sweep = state.intro * 1.75;
       for (const flake of flakes) {
         const level = flake.level;
@@ -692,7 +728,7 @@ export default function PixelSnow({
         const o = count * 4;
         instances[o] = flake.x / view.pixel;
         instances[o + 1] = flake.y / view.pixel;
-        instances[o + 2] = s.variant * SLOTS + slot;
+        instances[o + 2] = variantIndex * SLOTS + slot;
         instances[o + 3] = Math.min(1, depthLight * (0.85 + spark * 0.6)) * reveal * reveal;
         count++;
       }
@@ -708,25 +744,25 @@ export default function PixelSnow({
         } else {
           gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, pileWidth, 1, gl.RED, gl.FLOAT, pile);
         }
-        const pileProgram = programs.pile;
+        const pileProgram = activePrograms.pile;
         gl.useProgram(pileProgram.program);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, pileTexture);
-        gl.uniform1i(pileProgram.uniforms.uPile, 0);
-        gl.uniform1f(pileProgram.uniforms.uTime, state.time);
-        gl.uniform1f(pileProgram.uniforms.uLight, 1 - s.depth * 0.1);
+        gl.uniform1i(getUniform(pileProgram, 'uPile'), 0);
+        gl.uniform1f(getUniform(pileProgram, 'uTime'), state.time);
+        gl.uniform1f(getUniform(pileProgram, 'uLight'), 1 - s.depth * 0.1);
         gl.bindVertexArray(quadVao);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
       if (count > 0) {
-        const flake = programs.flake;
+        const flake = activePrograms.flake;
         gl.useProgram(flake.program);
-        gl.uniform2f(flake.uniforms.uGrid, snow.width, snow.height);
-        gl.uniform4f(flake.uniforms.uSizes, sizes[1], sizes[2], sizes[3], 0);
-        gl.uniform1f(flake.uniforms.uLargest, sizes[4]);
+        gl.uniform2f(getUniform(flake, 'uGrid'), snow.width, snow.height);
+        gl.uniform4f(getUniform(flake, 'uSizes'), sizeAt(1), sizeAt(2), sizeAt(3), 0);
+        gl.uniform1f(getUniform(flake, 'uLargest'), sizeAt(4));
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
-        gl.uniform1i(flake.uniforms.uAtlas, 0);
+        gl.uniform1i(getUniform(flake, 'uAtlas'), 0);
         gl.enable(gl.BLEND);
         gl.blendEquation(gl.MAX);
         gl.bindVertexArray(flakeVao);
@@ -740,41 +776,41 @@ export default function PixelSnow({
       gl.bindVertexArray(quadVao);
       let source = snow;
       for (let level = 0; level < down.length; level++) {
-        const target = down[level];
+        const target = getTarget(down, level);
         sizeTarget(target, Math.max(1, Math.ceil(source.width / 2)), Math.max(1, Math.ceil(source.height / 2)));
-        gl.useProgram(programs.down.program);
-        gl.uniform2f(programs.down.uniforms.uTexel, 1 / source.width, 1 / source.height);
-        gl.uniform2f(programs.down.uniforms.uTarget, target.width, target.height);
-        bindTexture(programs.down, 'uSource', 0, source.texture);
-        run(programs.down, target, target.width, target.height);
+        gl.useProgram(activePrograms.down.program);
+        gl.uniform2f(getUniform(activePrograms.down, 'uTexel'), 1 / source.width, 1 / source.height);
+        gl.uniform2f(getUniform(activePrograms.down, 'uTarget'), target.width, target.height);
+        bindTexture(activePrograms.down, 'uSource', 0, source.texture);
+        run(activePrograms.down, target, target.width, target.height);
         source = target;
       }
       for (let level = up.length - 1; level >= 0; level--) {
-        const from = level === up.length - 1 ? down[down.length - 1] : up[level + 1];
-        const target = up[level];
-        sizeTarget(target, down[level].width, down[level].height);
-        gl.useProgram(programs.up.program);
-        gl.uniform2f(programs.up.uniforms.uTexel, 1 / from.width, 1 / from.height);
-        gl.uniform2f(programs.up.uniforms.uTarget, target.width, target.height);
-        bindTexture(programs.up, 'uSource', 0, from.texture);
-        bindTexture(programs.up, 'uBase', 1, down[level].texture);
-        run(programs.up, target, target.width, target.height);
+        const from = level === up.length - 1 ? getTarget(down, down.length - 1) : getTarget(up, level + 1);
+        const target = getTarget(up, level);
+        const downTarget = getTarget(down, level);
+        sizeTarget(target, downTarget.width, downTarget.height);
+        gl.useProgram(activePrograms.up.program);
+        gl.uniform2f(getUniform(activePrograms.up, 'uTexel'), 1 / from.width, 1 / from.height);
+        gl.uniform2f(getUniform(activePrograms.up, 'uTarget'), target.width, target.height);
+        bindTexture(activePrograms.up, 'uSource', 0, from.texture);
+        bindTexture(activePrograms.up, 'uBase', 1, downTarget.texture);
+        run(activePrograms.up, target, target.width, target.height);
       }
 
-      const composite = programs.composite;
-      const c = composite.uniforms;
+      const composite = activePrograms.composite;
       gl.useProgram(composite.program);
-      gl.uniform2f(c.uResolution, canvas.width, canvas.height);
-      gl.uniform2f(c.uGrid, snow.width, snow.height);
-      gl.uniform1f(c.uPixel, view.pixel * view.ratio);
-      gl.uniform3fv(c.uColor, toRgb(s.color));
-      gl.uniform1f(c.uBrightness, s.brightness);
-      gl.uniform1f(c.uGlow, s.glow);
-      gl.uniform1f(c.uFade, s.fade);
-      gl.uniform1f(c.uOpacity, s.opacity);
-      gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
+      gl.uniform2f(getUniform(composite, 'uResolution'), canvas.width, canvas.height);
+      gl.uniform2f(getUniform(composite, 'uGrid'), snow.width, snow.height);
+      gl.uniform1f(getUniform(composite, 'uPixel'), view.pixel * view.ratio);
+      gl.uniform3fv(getUniform(composite, 'uColor'), toRgb(s.color));
+      gl.uniform1f(getUniform(composite, 'uBrightness'), s.brightness);
+      gl.uniform1f(getUniform(composite, 'uGlow'), s.glow);
+      gl.uniform1f(getUniform(composite, 'uFade'), s.fade);
+      gl.uniform1f(getUniform(composite, 'uOpacity'), s.opacity);
+      gl.uniform1f(getUniform(composite, 'uLightMode'), s.lightMode ? 1 : 0);
       bindTexture(composite, 'uSnow', 0, snow.texture);
-      bindTexture(composite, 'uGlowMap', 1, up[0].texture);
+      bindTexture(composite, 'uGlowMap', 1, getTarget(up, 0).texture);
       run(composite, null, canvas.width, canvas.height);
     };
 
@@ -894,7 +930,7 @@ export default function PixelSnow({
         gl.deleteTexture(target.texture);
         gl.deleteFramebuffer(target.framebuffer);
       }
-      for (const entry of Object.values(programs)) gl.deleteProgram(entry.program);
+      for (const entry of Object.values(activePrograms)) gl.deleteProgram(entry.program);
       gl.deleteTexture(atlasTexture);
       gl.deleteTexture(pileTexture);
       gl.deleteBuffer(quadBuffer);

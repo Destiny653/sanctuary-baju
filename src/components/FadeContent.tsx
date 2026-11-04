@@ -371,12 +371,16 @@ const FadeContent = ({
           const start = top - height * (1 - threshold);
           return start > limit ? limit - 1 : start;
         },
-        end: exit ? `bottom ${threshold * 100}%` : undefined,
+        ...(exit ? { end: `bottom ${threshold * 100}%` } : {}),
         once: !replaying,
         onEnter: () => tl.play(),
-        onLeave: exit ? () => tl.reverse() : undefined,
-        onEnterBack: exit ? () => tl.play() : undefined,
-        onLeaveBack: once ? undefined : () => tl.reverse()
+        ...(exit
+          ? {
+              onLeave: () => tl.reverse(),
+              onEnterBack: () => tl.play()
+            }
+          : {}),
+        ...(!once ? { onLeaveBack: () => tl.reverse() } : {})
       });
     }, el);
 
