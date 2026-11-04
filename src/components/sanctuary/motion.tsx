@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { narrationChapter } from "./film-narration";
+import { configureScrollTriggerMobile, softRefresh } from "./scroll-safe";
 
 let registered = false;
 /** ReactBits-style BlurText, scrubbed from actual video time instead of a one-off reveal. */
@@ -84,6 +85,7 @@ function prefersReduced() {
 export function useSmoothScroll() {
   useEffect(() => {
     ensureGsap();
+    configureScrollTriggerMobile();
     if (prefersReduced()) return;
 
     const coarse = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -94,6 +96,7 @@ export function useSmoothScroll() {
     let lenis: Lenis | undefined;
     let tick: ((time: number) => void) | undefined;
     let refreshTimer = 0;
+    let lastWidth = window.innerWidth;
 
     const stopLenis = () => {
       if (tick) gsap.ticker.remove(tick);
@@ -117,19 +120,25 @@ export function useSmoothScroll() {
     };
 
     const syncMobileScroll = () => {
-      // Native touch scroll above the film — global normalizeScroll made Hero/Descent glitch.
-      // Passion pin enables normalizeScroll only while that section is active.
       if (isTouchLayout()) stopLenis();
       else if (!lenis) startLenis();
-      ScrollTrigger.refresh();
+      // Only soft-refresh when the layout width actually changed.
+      if (window.innerWidth !== lastWidth) {
+        lastWidth = window.innerWidth;
+        softRefresh();
+      }
     };
 
     const id = window.requestAnimationFrame(() => {
       if (cancelled) return;
-      window.scrollTo(0, 0);
+      // Never yank an in-progress touch scroll back to the hero.
+      if (window.scrollY < 8) window.scrollTo(0, 0);
       if (!isTouchLayout()) startLenis();
-      ScrollTrigger.refresh();
-      refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
+      softRefresh();
+      // One deferred refresh is enough; cascading refreshes mid-scroll jump the page.
+      refreshTimer = window.setTimeout(() => {
+        if (window.scrollY < 24) softRefresh();
+      }, 500);
     });
 
     coarse.addEventListener("change", syncMobileScroll);
@@ -150,11 +159,18 @@ export function useSmoothScroll() {
 export function useGsapReveals() {
   useEffect(() => {
     ensureGsap();
+    configureScrollTriggerMobile();
     if (prefersReduced()) return;
     let ctx: gsap.Context | undefined;
     let refresh = 0;
-    let refresh2 = 0;
+    let built = false;
     const build = () => {
+      // Rebuilding mid-scroll (old 900ms rebuild) reverted pins and yanked the page to top.
+      if (built) {
+        softRefresh();
+        return;
+      }
+      built = true;
       ctx?.revert();
       ctx = gsap.context(() => {
         const narrow = window.matchMedia("(max-width: 760px)").matches;
@@ -189,16 +205,14 @@ export function useGsapReveals() {
           });
         }
       });
-      ScrollTrigger.refresh();
+      softRefresh();
     };
-    // Wait a frame so late client sections (film, passion) are in the DOM.
     const frame = window.requestAnimationFrame(build);
-    refresh = window.setTimeout(() => ScrollTrigger.refresh(), 400);
-    refresh2 = window.setTimeout(build, 900);
+    // Soft layout sync only — never full rebuild after the user may have started scrolling.
+    refresh = window.setTimeout(() => softRefresh(), 700);
     return () => {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(refresh);
-      window.clearTimeout(refresh2);
       ctx?.revert();
     };
   }, []);

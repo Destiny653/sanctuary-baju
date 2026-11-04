@@ -1,6 +1,7 @@
 import { useEffect, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { configureScrollTriggerMobile, softRefresh } from "./scroll-safe";
 
 function ensureGsap() {
   if (typeof window === "undefined") return;
@@ -20,7 +21,7 @@ function isTouchLayout() {
 
 /**
  * Pinned horizontal scrub on all viewports.
- * Mobile uses a near-1:1 scrub + fixed pin (no Lenis) to avoid vibration.
+ * Mobile: near-1:1 scrub + fixed pin; never rebuild on URL-bar height resize.
  */
 export function useHorizontalPin(
   section: RefObject<HTMLElement | null>,
@@ -28,14 +29,16 @@ export function useHorizontalPin(
 ) {
   useEffect(() => {
     ensureGsap();
+    configureScrollTriggerMobile();
     const s = section.current;
     const t = track.current;
     if (!s || !t || prefersReduced()) return;
 
     let ctx: gsap.Context | null = null;
-    let softRefresh: number | undefined;
+    let softRefreshTimer: number | undefined;
     let resizeTimer: number | undefined;
     let paintedSpacer: HTMLElement | null = null;
+    let lastWidth = window.innerWidth;
 
     const paintSpacer = (trigger?: ScrollTrigger) => {
       const fromTrigger = trigger
@@ -64,12 +67,6 @@ export function useHorizontalPin(
     const kill = () => {
       clearSpacer();
       s.classList.remove("passion-pin--native");
-      // Leave page on native scroll if we had scoped normalizeScroll to this pin.
-      try {
-        ScrollTrigger.normalizeScroll(false);
-      } catch {
-        /* ignore */
-      }
       ctx?.revert();
       ctx = null;
       gsap.set(t, { clearProps: "transform,x" });
@@ -85,7 +82,6 @@ export function useHorizontalPin(
       if (distance() < 24) return;
 
       const touch = isTouchLayout();
-      let normalizedHere = false;
 
       ctx = gsap.context(() => {
         gsap.to(t, {
@@ -97,32 +93,19 @@ export function useHorizontalPin(
             start: "top top",
             end: () => `+=${Math.max(distance(), window.innerHeight)}`,
             pin: true,
-            // Near-zero scrub on touch = 1:1 with finger (laggy scrub vibrates).
             scrub: touch ? 0.05 : true,
             anticipatePin: touch ? 0 : 1,
             invalidateOnRefresh: true,
             pinSpacing: true,
-            // fixed pin on touch; transform stays in sync with Lenis on desktop.
             pinType: touch ? "fixed" : "transform",
             fastScrollEnd: true,
             preventOverlaps: true,
             onRefresh: (self) => paintSpacer(self),
-            onToggle: (self) => {
-              paintSpacer(self);
-              // Normalize only while this pin is active — keeps Hero→Welcome native-smooth.
-              if (!touch) return;
-              if (self.isActive && !normalizedHere) {
-                ScrollTrigger.normalizeScroll(true);
-                normalizedHere = true;
-              } else if (!self.isActive && normalizedHere) {
-                ScrollTrigger.normalizeScroll(false);
-                normalizedHere = false;
-              }
-            },
+            onToggle: (self) => paintSpacer(self),
           },
         });
       }, s);
-      ScrollTrigger.refresh();
+      softRefresh();
       paintSpacer();
     };
 
@@ -130,10 +113,11 @@ export function useHorizontalPin(
     let pending = imgs.filter((img) => !img.complete).length;
     const onReady = () => {
       init();
-      softRefresh = window.setTimeout(() => {
-        ScrollTrigger.refresh();
+      // Soft sync after images settle — never if the user is mid-scroll on the upper page.
+      softRefreshTimer = window.setTimeout(() => {
+        softRefresh();
         paintSpacer();
-      }, 400);
+      }, 500);
     };
 
     if (pending === 0) {
@@ -146,19 +130,22 @@ export function useHorizontalPin(
       imgs.forEach((img) => {
         if (!img.complete) img.addEventListener("load", onLoad, { once: true });
       });
-      softRefresh = window.setTimeout(onReady, 900);
+      softRefreshTimer = window.setTimeout(onReady, 900);
     }
 
     const onResize = () => {
+      // Ignore mobile browser chrome show/hide (height-only).
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => init(), 160);
+      resizeTimer = window.setTimeout(() => init(), 200);
     };
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", onResize);
-      if (softRefresh) window.clearTimeout(softRefresh);
+      if (softRefreshTimer) window.clearTimeout(softRefreshTimer);
       if (resizeTimer) window.clearTimeout(resizeTimer);
       kill();
     };

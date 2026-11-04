@@ -8,6 +8,7 @@ import { videoTimeForProgress } from "./video-progress";
 import { FilmNarration } from "./motion";
 import { annunciationNarration } from "./film-narration";
 import { useI18n } from "@/i18n";
+import { configureScrollTriggerMobile, softRefresh } from "./scroll-safe";
 
 const SCROLL_MP4 = "/assets/vids/static-scroll-scrub.mp4";
 const SCROLL_WEBM = "/assets/vids/static-scroll.webm";
@@ -28,7 +29,9 @@ export function ScrollVideo() {
     if (!section || !video) return;
 
     gsap.registerPlugin(ScrollTrigger);
+    configureScrollTriggerMobile();
     const media = gsap.matchMedia();
+    const touch = window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
 
     media.add("(prefers-reduced-motion: no-preference)", () => {
       setReduced(false);
@@ -94,16 +97,19 @@ export function ScrollVideo() {
             start: "top top",
             end: () => `+=${Math.max(2400, window.innerHeight * 4)}`,
             pin: true,
-            scrub: 0.35,
-            anticipatePin: 1,
+            scrub: touch ? 0.05 : 0.35,
+            anticipatePin: touch ? 0 : 1,
             invalidateOnRefresh: true,
+            pinType: touch ? "fixed" : "transform",
             onRefresh: (self) => {
               const spacer = (self as ScrollTrigger & { spacer?: HTMLElement }).spacer;
-              spacer?.classList.add("passion-pin-spacer");
+              if (spacer) {
+                spacer.style.setProperty("background", "#f7f9fc", "important");
+              }
             },
           },
         });
-        ScrollTrigger.refresh();
+        softRefresh();
       };
 
       video.addEventListener("loadedmetadata", setup);
@@ -111,7 +117,10 @@ export function ScrollVideo() {
       video.addEventListener("seeked", seek);
       if (video.readyState >= 1) setup();
 
-      const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 500);
+      // Avoid a late refresh while the user is already moving through Hero/Descent.
+      const refreshTimer = window.setTimeout(() => {
+        if (window.scrollY < 32) softRefresh();
+      }, 600);
 
       return () => {
         disposed = true;
