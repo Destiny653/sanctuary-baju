@@ -3307,7 +3307,7 @@ html.fx [data-reveal].is-in {
   }
 
   .descent-figure-center {
-    width: clamp(9rem, 38vw, 14rem);
+    width: clamp(12.5rem, 52vw, 18rem);
   }
 
   .descent-spiral .infinite-spiral {
